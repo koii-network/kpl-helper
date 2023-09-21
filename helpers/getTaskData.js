@@ -1,10 +1,14 @@
 const { Connection, PublicKey } = require("@_koi/web3.js");
 
-async function getSubmissionList() {
+async function getTaskData(taskID) {
   const connection = new Connection("https://k2-testnet.koii.live");
-  const accountInfo = await connection.getAccountInfo(
-    new PublicKey("Aza7heKkadwn3pF2HQBRvs1KPfen1vphzeEbSAW2YHS1") // twitter crawler task ID
-  );
+
+  // Check if TASK_ID is defined
+  if (!taskID) {
+    throw new Error("TASK_ID is not defined in the .env file");
+  }
+
+  const accountInfo = await connection.getAccountInfo(new PublicKey(taskID));
   let taskState = JSON.parse(accountInfo.data);
 
   // Create a submissionList to contain each submission_value
@@ -21,7 +25,11 @@ async function getSubmissionList() {
     );
   }
 
-  return [submissionList, maxRound];
+  return {
+    submissions: submissionList,
+    maxRound: maxRound,
+    roundTime: taskState.round_time,
+  };
 }
 
-module.exports = getSubmissionList;
+module.exports = getTaskData;

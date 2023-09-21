@@ -75,7 +75,7 @@ async function queueCID(submissionList) {
   console.log(`Data wait to be extracted and POST: ${cidDataRawList.length}`);
   console.log("Extracting tweets data");
 
-  const cidQ = new Queue(40, 15);
+  const cidQ = new Queue(40, 30);
 
   const tweetList = await processInQueue(cidQ, cidDataRawList, readCID);
 
