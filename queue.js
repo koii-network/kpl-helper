@@ -20,8 +20,6 @@ async function queuePost(tweetList, i) {
       continue;
     }
 
-    console.log(tweet);
-
     count.push(
       postQ.run(() =>
         sendTweet(tweet, i++).catch((e) => {
@@ -81,7 +79,6 @@ async function queueCID(submissionList) {
 
   // Filter out any null values (from errors) and flatten the list if needed
   const flatTweetList = tweetList.filter(Boolean).flat();
-  console.log(flatTweetList);
 
   return flatTweetList;
 }

@@ -25,8 +25,18 @@ async function getTaskData(taskID) {
     );
   }
 
+  //Cleaning
+  const uniqueUrls = new Set(); // To store unique URLs
+  const uniqueSubmissionList = submissionList.filter((submission) => {
+    if (!uniqueUrls.has(submission.url)) {
+      uniqueUrls.add(submission.url);
+      return true; // Keep this object in the new array
+    }
+    return false; // Remove this object from the new array
+  });
+
   return {
-    submissions: submissionList,
+    submissions: uniqueSubmissionList,
     maxRound: maxRound,
     roundTime: taskState.round_time,
   };
