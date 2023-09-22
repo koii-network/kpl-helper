@@ -44,7 +44,7 @@ jspm_packages/
 *.tgz
 
 # dotenv environment variables file
-.env
+
 
 # IDEs and editors
 /.idea
