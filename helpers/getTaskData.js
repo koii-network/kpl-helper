@@ -16,7 +16,6 @@ async function getTaskData(taskID) {
 
   // Identify the round with the highest number
   let maxRound = Math.max(...Object.keys(taskState.submissions).map(Number));
-
   // Iterate through the entries in the highest round
   for (let entry in taskState.submissions[maxRound]) {
     // Extract the submission_value and add it to the list
