@@ -1,8 +1,8 @@
 const { MongoClient } = require("mongodb");
+require("dotenv").config({ path: "../.env" });
 
-const uri =
-  "mongodb+srv://yigid:PVBKF5ielcmk9ZPb@cluster0.apkfetr.mongodb.net/?retryWrites=true&w=majority";
-const dbName = "Twitter";
+const uri = process.env.DB_KEY;
+const dbName = process.env.DB_NAME;
 
 async function removeDuplicates() {
   const client = new MongoClient(uri, { useUnifiedTopology: true });

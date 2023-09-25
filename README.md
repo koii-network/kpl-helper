@@ -1,6 +1,6 @@
 # Koii Task Middleman
 
-This project is an example solution that converts the data produced by Koii Nodes into a ready-to-use standartized JSON format.
+This project aims to bridge the gap between the Koii Task Submissions and a standardized database.
 
 ![Task Middleman](https://i.imgur.com/JeNpHHO.png)
 
@@ -8,7 +8,7 @@ This project is an example solution that converts the data produced by Koii Node
 
 - Reads submissions from a Koii Task.
 - Extracts the referred data from IPFS using a submission list.
-- Posts the extracted data to a specified server.
+- Stores the data in a MongoDB database.
 
 It uses a queuing system to manage concurrency and ensure efficient processing.
 
@@ -28,7 +28,7 @@ It uses a queuing system to manage concurrency and ensure efficient processing.
    Before running the project, make sure to install the required dependencies:
 
 ```bash
-npm install
+yarn
 ```
 
 2. Configure Server and Tokens

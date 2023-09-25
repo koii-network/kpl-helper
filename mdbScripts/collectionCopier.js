@@ -1,7 +1,7 @@
 const { MongoClient } = require("mongodb");
+require("dotenv").config({ path: "../.env" });
 
-const uri =
-  "mongodb+srv://yigid:PVBKF5ielcmk9ZPb@cluster0.apkfetr.mongodb.net/?retryWrites=true&w=majority";
+const uri = process.env.DB_KEY;
 const client = new MongoClient(uri, {});
 
 async function copyCollection() {
