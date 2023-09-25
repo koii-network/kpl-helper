@@ -3,27 +3,9 @@ const getTaskData = require("./helpers/getTaskData");
 const { queuePost, queueCID } = require("./queue");
 const MongoClient = require("mongodb").MongoClient;
 require("dotenv").config();
+const saveTweetsToMongoDB = require("./api/saveTweetsToMongoDB");
 
-const DB_KEY = process.env.DB_KEY;
 let round = 0;
-
-async function saveTweetsToMongo(tweetList) {
-  const client = new MongoClient(DB_KEY);
-
-  try {
-    await client.connect();
-
-    const db = client.db("Twitter");
-    const collection = db.collection("Tweets");
-    const result = await collection.insertMany(tweetList);
-
-    console.log("Data inserted successfully:", result.insertedCount);
-  } catch (err) {
-    console.error("Error:", err);
-  } finally {
-    await client.close();
-  }
-}
 
 async function main() {
   // Get submission list, max round, and round time from Koii
@@ -35,12 +17,11 @@ async function main() {
     console.log("Current round is", round, "...");
     // Extract tweets from IPFS
     const tweetList = await queueCID(taskData.submissions);
-    saveTweetsToMongo(tweetList);
+    await saveTweetsToMongoDB(tweetList);
 
     /*     // POST data to server
     let i = 0;
     let result = await queuePost(tweetList, i); */
-
     console.log("Operation complete, calling the function again.");
     main();
   } else {

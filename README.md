@@ -2,6 +2,8 @@
 
 This project is an example solution that converts the data produced by Koii Nodes into a ready-to-use standartized JSON format.
 
+![Task Middleman](https://i.imgur.com/05misSU.png)
+
 ## Steps:
 
 - Reads submissions from a Koii Task.
