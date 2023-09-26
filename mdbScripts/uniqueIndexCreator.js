@@ -11,7 +11,7 @@ async function createUniqueIndex() {
     await client.connect();
 
     const db = client.db(dbName);
-    const collection = db.collection("Tweets");
+    const collection = db.collection("Tweets_AI");
 
     await collection.createIndex({ tweets_id: 1 }, { unique: true });
 
