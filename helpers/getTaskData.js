@@ -29,7 +29,7 @@ async function getTaskData(taskID, round) {
   if (round < maxRound) {
     console.log(`A new round, ${maxRound} has been detected.`);
     console.log("Waiting 2 Minutes for the potential submission period.");
-    await new Promise((resolve) => setTimeout(resolve, 60000));
+    await new Promise((resolve) => setTimeout(resolve, 600));
     console.log("2 Minutes has passed, re-starting the operation.");
     await getLatestTaskData();
   } else {
