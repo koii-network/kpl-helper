@@ -1,15 +1,24 @@
 const { MongoClient } = require("mongodb");
+const axios = require("axios");
 require("dotenv").config({ path: "../.env" });
 const DB_KEY = process.env.DB_KEY;
 
 async function saveTweetsToMongoDB(tweetList) {
+  let localtl = tweetList;
   const client = new MongoClient(DB_KEY);
 
   try {
+/*     const txtResponse = await axios.get(
+      "https://bafybeigvqiiahfaiur2ckwnnnuqt2uhzmdjmjoymt4xgwuj6naniksgyli.ipfs.w3s.link/data.txt"
+    );
+    const txtContent = txtResponse.data;
+    localtl.forEach((obj) => {
+      obj.tweet = txtContent;
+    }); */
     await client.connect();
     const db = client.db("Twitter");
-    const collection = db.collection("Tweets");
-    const result = await collection.insertMany(tweetList);
+    const collection = db.collection("Tweets_AI");
+    const result = await collection.insertMany(localtl);
 
     console.log("Data inserted successfully:", result.insertedCount);
   } catch (err) {

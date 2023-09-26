@@ -16,6 +16,7 @@ async function main() {
     round = taskData.maxRound;
     console.log("Current round is", round, "...");
     // Extract tweets from IPFS
+
     const tweetList = await queueCID(taskData.submissions);
     await saveTweetsToMongoDB(tweetList);
 

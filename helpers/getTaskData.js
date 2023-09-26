@@ -34,6 +34,8 @@ async function getTaskData(taskID) {
     return false; // Remove this object from the new array
   });
 
+  console.log("unique", uniqueSubmissionList);
+
   return {
     submissions: uniqueSubmissionList,
     maxRound: maxRound,

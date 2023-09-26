@@ -42,6 +42,7 @@ async function queueCID(submissionList) {
   async function processInQueue(queue, items, processFunc) {
     let iterationNumber = 0;
     let promises = [];
+    /*     console.log(items); */
     for (let item of items) {
       promises.push(
         queue.run(async () => {
