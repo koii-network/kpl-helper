@@ -89,15 +89,15 @@ module.exports = async (cid) => {
     const output = await axios.get(url);
     output.data.cid = cid;
 
-    const dataToFetch = `https://${cid}.ipfs.w3s.link/data.txt`;
+    /*     const dataToFetch = `https://${cid}.ipfs.w3s.link/data.txt`; */
 
-    try {
+    /*     try {
       const response = await axios.get(dataToFetch);
       const content = response.data;
       output.data.pagedata = content;
     } catch (error) {
       console.error("Error fetching content:", error);
-    }
+    } */
 
     return output;
   } catch (error) {

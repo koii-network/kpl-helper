@@ -11,7 +11,7 @@ async function removeDuplicates() {
     await client.connect();
 
     const db = client.db(dbName);
-    const collection = db.collection("Tweets");
+    const collection = db.collection("Tweets_AI");
 
     const duplicates = [];
 
