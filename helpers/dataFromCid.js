@@ -77,11 +77,28 @@ module.exports = async (cid) => {
 
   // Get file info
   const file = await res.files();
+
   const url = `https://${file[0].cid}.ipfs.w3s.link/?filename=${file[0].name}`;
+
+  /* 
+  const txtResponse = await axios.get(url_txt);
+  const txtContent = txtResponse.data; */
 
   try {
     // Fetch file content
     const output = await axios.get(url);
+    output.data.cid = cid;
+
+    /*     const dataToFetch = `https://${cid}.ipfs.w3s.link/data.txt`; */
+
+    /*     try {
+      const response = await axios.get(dataToFetch);
+      const content = response.data;
+      output.data.pagedata = content;
+    } catch (error) {
+      console.error("Error fetching content:", error);
+    } */
+
     return output;
   } catch (error) {
     console.error("ERROR", error);

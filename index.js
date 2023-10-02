@@ -6,16 +6,27 @@ require("dotenv").config();
 const saveTweetsToMongoDB = require("./api/saveTweetsToMongoDB");
 
 let round = 0;
+taskId = process.env.TASK_ID;
 
 async function main() {
-  // Get submission list, max round, and round time from Koii
-  const taskData = await getTaskData(process.env.TASK_ID);
+  const getTaskDataWrapper = async (taskId, round) => {
+    let wrappedTaskData = await getTaskData(taskId, round);
+    if (wrappedTaskData === false) {
+      console.log("No new round found. Retrying in 60 seconds...");
+      await new Promise((resolve) => setTimeout(resolve, 60000));
+      return await getTaskDataWrapper(taskId, round);
+    } else {
+      return wrappedTaskData;
+    }
+  };
 
-  //Checks if there is a new round, then get data
+  const taskData = await getTaskDataWrapper(taskId, round);
+
   if (round < taskData.maxRound) {
     round = taskData.maxRound;
     console.log("Current round is", round, "...");
     // Extract tweets from IPFS
+
     const tweetList = await queueCID(taskData.submissions);
     await saveTweetsToMongoDB(tweetList);
 
