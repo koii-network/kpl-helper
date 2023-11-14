@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "dockerize": "docker build -t yigitkoii/twitter_task_middleman . && docker push yigitkoii/twitter_task_middleman",
     "server": "node tests/testserver.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

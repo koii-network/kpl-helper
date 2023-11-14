@@ -1,7 +1,7 @@
 const { Connection, PublicKey } = require("@_koi/web3.js");
 
 async function getTaskData(taskID, round) {
-  const connection = new Connection("https://k2-testnet.koii.live");
+  const connection = new Connection("https://testnet.koii.live");
 
   // Check if TASK_ID is defined
   if (!taskID) {
