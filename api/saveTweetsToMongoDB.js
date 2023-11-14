@@ -17,7 +17,7 @@ async function saveTweetsToMongoDB(tweetList) {
     }); */
     await client.connect();
     const db = client.db("Twitter");
-    const collection = db.collection("Tweets_AI");
+    const collection = db.collection("Tweets_November");
     try {
       const result = await collection.insertMany(localtl);
     } catch (error) {
