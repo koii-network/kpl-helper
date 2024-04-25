@@ -3,27 +3,28 @@ const axios = require("axios");
 require("dotenv").config();
 const DB_KEY = process.env.DB_KEY;
 
-async function saveTweetsToMongoDB(tweetList) {
+async function saveTweetsToMongoDB(allTweetData) {
  const client = new MongoClient(DB_KEY);
 
   try {
     await client.connect();
     console.log("Connected to MongoDB.");
-    const db = client.db("Twitter-test");
+    const db = client.db("Twitter-new");
     const collection = db.collection("tweets");
 
     // Create a unique index on the 'tweets_id' field to prevent duplicate entries
     await collection.createIndex({ "tweets_id": 1 }, { unique: true });
 
-    for (let tweet of tweetList) {
-      const filter = { "tweets_id": tweet.data.tweets_id };
-      const update = { $setOnInsert: tweet.data };
-      const options = { upsert: true };
+    const operations = allTweetData.map(tweet => ({
+      updateOne: {
+        filter: { "tweets_id": tweet.tweets_id },
+        update: { $set: tweet },
+        upsert: true
+      }
+    }));
 
-      await collection.updateOne(filter, update, options);
-    }
-
-    console.log(`${tweetList.length} tweets inserted/updated.`);
+    const result = await collection.bulkWrite(operations, { ordered: false });
+    console.log(`${result.upsertedCount + result.modifiedCount} tweets inserted or updated.`);
   } catch (err) {
     console.error("Error:", err);
   } finally {

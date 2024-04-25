@@ -63,6 +63,37 @@ WEB3_GET_STORAGE_KEYS.forEach((token, index) => {
   storageClients.push(new Web3Storage({ token }));
 });
 
+async function fetchFileMetadata(client, cid) {
+  const res = await client.get(cid);
+  if (!res.ok) throw new Error(`Failed to get metadata for CID ${cid} with status: ${res.status}`);
+  return await res.files();
+}
+
+function constructURLs(cid, filename) {
+  return [
+    `https://cloudflare-ipfs.com/ipfs/${cid}/${filename}`,
+    `https://${cid}.ipfs.sphn.link/${filename}`,
+    `https://${cid}.ipfs.w3s.link/?filename=${filename}`,
+    `https://${cid}.ipfs.dweb.link/?filename=${filename}`,
+    `https://cloudflare-ipfs.com/ipfs/${cid}/${filename}`,
+    `https://${cid}.ipfs.storry.tv/${filename}`
+  ];
+}
+
+async function fetchFileContent(urls) {
+  const fetchPromises = urls.map(url =>
+      axios.get(url).then(response => ({ success: true, data: response.data }))
+          .catch(error => ({ success: false, error: error.toString() }))
+  );
+
+  const results = await Promise.allSettled(fetchPromises);
+  const successfulFetch = results.find(result => result.status === 'fulfilled' && result.value.success);
+  
+    
+  return successfulFetch ? successfulFetch.value.data : null;
+}
+
+
 module.exports = async (cid) => {
   // Check if CID is provided
   if (!cid) throw new Error("CID is required");
@@ -71,51 +102,41 @@ module.exports = async (cid) => {
   const selectedClient =
     storageClients[Math.floor(Math.random() * storageClients.length)];
 
-  // Fetch file metadata from the selected Web3 storage
-  const res = await selectedClient.get(cid);
-    if (!res.ok) return false;
+  // // Fetch file metadata from the selected Web3 storage
+  // const res = await selectedClient.get(cid);
+  //   if (!res.ok) return false;
 
-  // Get file info
-  const file = await res.files();
+  // // Get file info
+  // const file = await res.files();
 
   // const url = `https://${file[0].cid}.ipfs.w3s.link/?filename=${file[0].name}`;
-  const urls = [
-    `https://${file[0].cid}.ipfs.w3s.link/?filename=${file[0].name}`,
-    `https://${file[0].cid}.ipfs.dweb.link/?filename=${file[0].name}`,
-    `https://ipfs.io/ipfs/${file[0].cid}`,
-    `https://cloudflare-ipfs.com/ipfs/${file[0].cid}`,
-    `https://${file[0].cid}.ipfs.sphn.link/${file[0].cid}`
-  ];
+  // const urls = [
+  //   `https://${file[0].cid}.ipfs.sphn.link/${file[0].cid}`,
+  //   `https://${file[0].cid}.ipfs.w3s.link/?filename=${file[0].name}`,
+  //   `https://${file[0].cid}.ipfs.dweb.link/?filename=${file[0].name}`,
+  //   `https://ipfs.io/ipfs/${file[0].cid}`,
+  //   `https://cloudflare-ipfs.com/ipfs/${file[0].cid}`
+  // ];
   
 
   /* 
   const txtResponse = await axios.get(url_txt);
   const txtContent = txtResponse.data; */
-  for (const url of urls) {
-    try {
-        // Fetch file content
-        const response = await axios.get(url);
-        const output = response.data
-        // console.log(`output:${output}`);
-        // output.data.cid = cid;
-       
-
-        /*     const dataToFetch = `https://${cid}.ipfs.w3s.link/data.txt`; */
-
-        /*     try {
-          const response = await axios.get(dataToFetch);
-          const content = response.data;
-          output.data.pagedata = content;
-        } catch (error) {
-          console.error("Error fetching content:", error);
-        } */
-
-        return output;
-      } catch (error) {
-        console.error("ERROR", error);
-      }
-
-  }
+  
+  try {
+    const files = await fetchFileMetadata(selectedClient, cid);
+    const urls = constructURLs(files[0].cid, files[0].name);
+    const originalData = await fetchFileContent(urls);
+    const content = originalData.map(item => item.data);
+    if (content) {
+        return content;
+    } else {
+        throw new Error("All URLs failed to fetch file content.");
+    }
+  } catch (error) {
+    console.error("ERROR:", error.message);
+    return null;
+}
 
   
 };
