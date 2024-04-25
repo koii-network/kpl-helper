@@ -56,6 +56,7 @@ const WEB3_GET_STORAGE_KEYS = [
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweEJhRWIwNjg0RDVDMzAxODljMDYyOThhNUJEMkY4YmQ1ODBGMDBDRDkiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2OTI5ODQ2MzU0MTUsIm5hbWUiOiJzdG9yYWdlNTAifQ.N0nwMJuWj6raDbnuBZFPVqhdAdxJH_Z_CVhVlIhS0H0",
 ];
 
+
 let storageClients = [];
 
 WEB3_GET_STORAGE_KEYS.forEach((token, index) => {
@@ -72,36 +73,49 @@ module.exports = async (cid) => {
 
   // Fetch file metadata from the selected Web3 storage
   const res = await selectedClient.get(cid);
-
-  if (!res.ok) return false;
+    if (!res.ok) return false;
 
   // Get file info
   const file = await res.files();
 
-  const url = `https://${file[0].cid}.ipfs.w3s.link/?filename=${file[0].name}`;
+  // const url = `https://${file[0].cid}.ipfs.w3s.link/?filename=${file[0].name}`;
+  const urls = [
+    `https://${file[0].cid}.ipfs.w3s.link/?filename=${file[0].name}`,
+    `https://${file[0].cid}.ipfs.dweb.link/?filename=${file[0].name}`,
+    `https://ipfs.io/ipfs/${file[0].cid}`,
+    `https://cloudflare-ipfs.com/ipfs/${file[0].cid}`,
+    `https://${file[0].cid}.ipfs.sphn.link/${file[0].cid}`
+  ];
+  
 
   /* 
   const txtResponse = await axios.get(url_txt);
   const txtContent = txtResponse.data; */
+  for (const url of urls) {
+    try {
+        // Fetch file content
+        const response = await axios.get(url);
+        const output = response.data
+        // console.log(`output:${output}`);
+        // output.data.cid = cid;
+       
 
-  try {
-    // Fetch file content
-    const output = await axios.get(url);
-    output.data.cid = cid;
+        /*     const dataToFetch = `https://${cid}.ipfs.w3s.link/data.txt`; */
 
-    /*     const dataToFetch = `https://${cid}.ipfs.w3s.link/data.txt`; */
+        /*     try {
+          const response = await axios.get(dataToFetch);
+          const content = response.data;
+          output.data.pagedata = content;
+        } catch (error) {
+          console.error("Error fetching content:", error);
+        } */
 
-    /*     try {
-      const response = await axios.get(dataToFetch);
-      const content = response.data;
-      output.data.pagedata = content;
-    } catch (error) {
-      console.error("Error fetching content:", error);
-    } */
+        return output;
+      } catch (error) {
+        console.error("ERROR", error);
+      }
 
-    return output;
-  } catch (error) {
-    console.error("ERROR", error);
-    throw error; // Re-throw error to handle it in a higher-level function if needed
   }
+
+  
 };

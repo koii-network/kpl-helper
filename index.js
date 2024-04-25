@@ -22,12 +22,16 @@ async function main() {
 
   const taskData = await getTaskDataWrapper(taskId, round);
 
+  
+
   if (round < taskData.maxRound) {
     round = taskData.maxRound;
     console.log("Current round is", round, "...");
     // Extract tweets from IPFS
 
-    const tweetList = await queueCID(taskData.submissions);
+    const submissionList = taskData.submissions
+    const tweetList = await queueCID(submissionList);
+    // console.log(taskData.submissions);
     await saveTweetsToMongoDB(tweetList);
 
     /*     // POST data to server
