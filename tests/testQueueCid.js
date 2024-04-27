@@ -1,55 +1,23 @@
 const { queueCID } = require('../queue');
 
-// const submissionList = [
-//     "bafybeibmr2eic42jt6krmgdqhioeeibx263bfe2xkedtkdydcsfuhkqmki",
-//     "bafybeic7vdsjmct4dld44smlhujckkdja7hqv4dewzy2a36euecpgfxpf4"
-// ]; 
 
-// async function testQueueCID() {
-//   try {
-//     const tweetList = await queueCID(submissionList);
-//     // console.log('Returned tweet list:', tweetList);
-
-//     if (Array.isArray(tweetList) && tweetList.length > 0) {
-//       console.log('Test passed: queueCID returns a non-empty array.');
-//     } else {
-//       console.error('Test failed: queueCID does not return a non-empty array.');
-//     }
-
-    
-//   } catch (error) {
-//     console.error('Test failed with error:', error);
-//   }
-// }
-
-// module.exports = {
-//     submissionList,  
-//     testQueueCID 
-// };
-
-// testQueueCID();
-
-const batch = [
-  "bafybeibmr2eic42jt6krmgdqhioeeibx263bfe2xkedtkdydcsfuhkqmki",
-  "bafybeic7vdsjmct4dld44smlhujckkdja7hqv4dewzy2a36euecpgfxpf4"
-]; 
-
-// Test function to simulate queueCID usage
 async function testQueueCID() {
-
-  const batchNumber = 0;
-  const totalBatches = 1;
+  const submissionList = [
+    "bafybeihbyadzr3bth45xu4r3i4ivrax3lp3v5d2adkwrnsnld2fmf4jmri",
+      "bafybeiccwiwkkbj7vxonpj4ahphoaipn22ohe3vqe2qhe7t7uhtlzz2gbe",
+      "bafybeiglpjh7ks42hxrqwkhlc52mriruvdu5tnwoezdsvken6izulcwbka",
+      "bafybeihxpjh5s6jkya6hqkreqvnqe44pzsujhohjqlo3pyerzsrrsua7o4"
+  ]; 
 
   try {
-      const results = await queueCID(batch, batchNumber, totalBatches);
-      console.log('Test results:', results);
+      const tweetData = await queueCID(submissionList);
+      console.log('Test tweetData:', tweetData);
+      console.log("length", tweetData.length);
+
   } catch (error) {
-      console.error('Test failed:', error);
+      console.error('Test Failed:', error);
   }
 }
 
-module.exports = {
-  batch,
-  testQueueCID
-}
+
 testQueueCID();

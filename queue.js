@@ -1,8 +1,9 @@
 const { Queue } = require("async-await-queue");
 const sendTweet = require("./api/sendTweet");
 const dataFromCid = require("./helpers/dataFromCid");
+const saveTweetsToMongoDB = require("./api/saveTweetsToMongoDB");
 
-// const BATCH_SIZE = 10;
+const BATCH_SIZE = 10;
 
 
 async function queuePost(tweetList, i) {
@@ -38,56 +39,97 @@ async function queuePost(tweetList, i) {
   return true;
 }
 
-
-async function queueCID(batch, batchNumber, totalBatches) {
-  if (!batch || !Array.isArray(batch)) {
-      console.error("Invalid batch data provided:", batch);
-      return [];
+async function queueCID(submissionList,batchSize = BATCH_SIZE) {
+  console.log("submissionList,fromquue",submissionList);
+  // Helper function to process items in a queue
+  async function processInQueue(queue, items, processFunc,totalItems) {
+    let iterationNumber = 0;
+    let promises = [];
+    /*     console.log(items); */
+    for (let item of items) {
+      promises.push(
+        queue.run(async () => {
+          try {
+            iterationNumber++;
+            console.log(`${totalProcessedItems + iterationNumber} out of ${totalItems}`);
+            const result = await processFunc(item);
+            if (result === null) {
+              console.error(`Processing failed for item with CID: ${item}`);
+            }
+            return result;
+          } catch (e) {
+            console.error("Error processing item:", item, "Error:", e);
+            return null; 
+          }
+        })
+      );
+    }
+    return Promise.all(promises);
   }
+
+  console.log("Extracting submission data...");
+  if (submissionList && Array.isArray(submissionList)) {
+    console.log("Latest round has", submissionList.length, "submissions.");
+    // ...
+  } else {
+    console.error("submissionList is not a valid array:", submissionList);
+    return [];
+  }
+  // console.log("Latest round has", submissionList.length, "submissions.");
 
   const submissionQ = new Queue(5, 100);
-  console.log(`Last round has ${totalBatches} submisssion`);
-  console.log(`Processing batch ${batchNumber + 1} of ${totalBatches} with ${batch.length} submissions.`);
-  const results = await processInQueue(submissionQ, batch, readSubmission, batchNumber, batch.length, totalBatches);
-  return results.flat().filter(Boolean); ; // Filter out null values due to errors
+  const results = [];
+  let totalProcessedItems = 0;
+
+
+  while (totalProcessedItems < submissionList.length) {
+    const remainingItems = submissionList.slice(totalProcessedItems, totalProcessedItems + batchSize);
+    const batchResults = await processInQueue(submissionQ, remainingItems, readSubmission, submissionList.length);
+    const filteredResults = batchResults.filter(Boolean).flat();
+
+    await saveTweetsToMongoDB(filteredResults);
+
+    results.push(...filteredResults);
+    totalProcessedItems += remainingItems.length;
+    console.log("Total items processed:", totalProcessedItems, "out of", submissionList.length);
+  }
+
+  console.log(`Total tweets extracted and saved: ${results.length}`);
+  console.log("Extracting tweets data");
+
+  return results;
+
+
+  // // Use queue to process each CID submission
+  // const tweetDataArrays = await processInQueue(
+  //   submissionQ,
+  //   submissionList,
+  //   readSubmission
+  // );
+
+  // // Filter out any null values (from errors) and flatten the list if needed
+  // const flatTweetList = tweetDataArrays.filter(Boolean).flat();
+
+  // console.log(`Data wait to be extracted and POST: ${flatTweetList.length}`);
+  // console.log("Extracting tweets data");
+
+  // // const cidQ = new Queue(40, 30);
+
+  // // const tweetList = await processInQueue(cidQ, cidDataRawList, readCID);
+
+
+  // return flatTweetList;
 }
-
-
-// Helper function to process items in a queue with additional context for logging
-async function processInQueue(queue, items, processFunc, batchNumber, totalItemsInBatch, totalBatches) {
-  return Promise.all(items.map((item, index) => queue.run(async () => {
-      const orderNumber = batchNumber * totalItemsInBatch + index + 1;
-      console.log(`${orderNumber} out of total ${totalBatches * totalItemsInBatch} in batch No. ${batchNumber + 1} processing CID: ${item}`);
-      try {
-          const data = await processFunc(item);
-          console.log(`Successfully processed CID: ${item}`);
-          return data;
-      } catch (e) {
-          console.error(`Error processing CID ${item}: ${e}`);
-          return null;
-      }
-  })));
-}
-
 
 async function readSubmission(cid) {
-  console.log(`Starting to fetch data from CID: ${cid}`);
-  try {
-    let tweetData = await dataFromCid(cid);
-    console.log(`Data fetched successfully`);
-    return tweetData;
-  } catch (e) {
-    console.error(`Failed to fetch data`);
-    return null;
-  }
+  // console.log(cid);
+  let tweetData = await dataFromCid(cid);
+  // console.log('Data for CID:', cid, tweetData); 
+  return tweetData;
 }
 
 
-// async function readSubmission(submission) {
-//   // console.log(submission);
-//   let tweetData = await dataFromCid(submission.cid);
-//   console.log(tweetData);
-//   return tweetData.data;
-// }
-
-module.exports = { queuePost, queueCID };
+module.exports = {
+  queuePost,
+  queueCID
+};
