@@ -1,8 +1,10 @@
 const { Queue } = require("async-await-queue");
 const sendTweet = require("./api/sendTweet");
 const dataFromCid = require("./helpers/dataFromCid");
+const saveTweetsToMongoDB = require("./api/saveTweetsToMongoDB");
 
 const BATCH_SIZE = 10;
+
 
 async function queuePost(tweetList, i) {
   // Create a queue with a concurrency of 5
@@ -37,10 +39,10 @@ async function queuePost(tweetList, i) {
   return true;
 }
 
-async function queueCID(submissionList) {
+async function queueCID(submissionList,batchSize = BATCH_SIZE) {
   console.log("submissionList,fromquue",submissionList);
   // Helper function to process items in a queue
-  async function processInQueue(queue, items, processFunc) {
+  async function processInQueue(queue, items, processFunc,totalItems) {
     let iterationNumber = 0;
     let promises = [];
     /*     console.log(items); */
@@ -49,11 +51,15 @@ async function queueCID(submissionList) {
         queue.run(async () => {
           try {
             iterationNumber++;
-            console.log(iterationNumber, "out of", items.length, "processing CID:", item);
-            return await processFunc(item);
+            console.log(`${totalProcessedItems + iterationNumber} out of ${totalItems}`);
+            const result = await processFunc(item);
+            if (result === null) {
+              console.error(`Processing failed for item with CID: ${item}`);
+            }
+            return result;
           } catch (e) {
             console.error("Error processing item:", item, "Error:", e);
-            return null; // Return null if an error occurs
+            return null; 
           }
         })
       );
@@ -72,38 +78,58 @@ async function queueCID(submissionList) {
   // console.log("Latest round has", submissionList.length, "submissions.");
 
   const submissionQ = new Queue(5, 100);
+  const results = [];
+  let totalProcessedItems = 0;
 
-  // Use queue to process each CID submission
-  const tweetDataArrays = await processInQueue(
-    submissionQ,
-    submissionList,
-    readSubmission
-  );
 
-  // Filter out any null values (from errors) and flatten the list if needed
-  const flatTweetList = tweetDataArrays.filter(Boolean).flat();
+  while (totalProcessedItems < submissionList.length) {
+    const remainingItems = submissionList.slice(totalProcessedItems, totalProcessedItems + batchSize);
+    const batchResults = await processInQueue(submissionQ, remainingItems, readSubmission, submissionList.length);
+    const filteredResults = batchResults.filter(Boolean).flat();
 
-  console.log(`Data wait to be extracted and POST: ${flatTweetList.length}`);
+    await saveTweetsToMongoDB(filteredResults);
+
+    results.push(...filteredResults);
+    totalProcessedItems += remainingItems.length;
+    console.log("Total items processed:", totalProcessedItems, "out of", submissionList.length);
+  }
+
+  console.log(`Total tweets extracted and saved: ${results.length}`);
   console.log("Extracting tweets data");
 
-  // const cidQ = new Queue(40, 30);
+  return results;
 
-  // const tweetList = await processInQueue(cidQ, cidDataRawList, readCID);
 
-  return flatTweetList;
+  // // Use queue to process each CID submission
+  // const tweetDataArrays = await processInQueue(
+  //   submissionQ,
+  //   submissionList,
+  //   readSubmission
+  // );
+
+  // // Filter out any null values (from errors) and flatten the list if needed
+  // const flatTweetList = tweetDataArrays.filter(Boolean).flat();
+
+  // console.log(`Data wait to be extracted and POST: ${flatTweetList.length}`);
+  // console.log("Extracting tweets data");
+
+  // // const cidQ = new Queue(40, 30);
+
+  // // const tweetList = await processInQueue(cidQ, cidDataRawList, readCID);
+
+
+  // return flatTweetList;
 }
 
 async function readSubmission(cid) {
   // console.log(cid);
   let tweetData = await dataFromCid(cid);
+  // console.log('Data for CID:', cid, tweetData); 
   return tweetData;
 }
 
-// async function readSubmission(submission) {
-//   // console.log(submission);
-//   let tweetData = await dataFromCid(submission.cid);
-//   console.log(tweetData);
-//   return tweetData.data;
-// }
 
-module.exports = { queuePost, queueCID };
+module.exports = {
+  queuePost,
+  queueCID
+};

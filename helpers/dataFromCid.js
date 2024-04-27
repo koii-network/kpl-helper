@@ -64,6 +64,7 @@ WEB3_GET_STORAGE_KEYS.forEach((token, index) => {
 });
 
 module.exports = async (cid) => {
+  
   // Check if CID is provided
   if (!cid) throw new Error("CID is required");
 
@@ -78,44 +79,32 @@ module.exports = async (cid) => {
   // Get file info
   const file = await res.files();
 
-  // const url = `https://${file[0].cid}.ipfs.w3s.link/?filename=${file[0].name}`;
   const urls = [
+    `https://cloudflare-ipfs.com/ipfs/${file[0].cid}`,
     `https://${file[0].cid}.ipfs.w3s.link/?filename=${file[0].name}`,
     `https://${file[0].cid}.ipfs.dweb.link/?filename=${file[0].name}`,
     `https://ipfs.io/ipfs/${file[0].cid}`,
-    `https://cloudflare-ipfs.com/ipfs/${file[0].cid}`,
     `https://${file[0].cid}.ipfs.sphn.link/${file[0].cid}`
   ];
   
 
-  /* 
-  const txtResponse = await axios.get(url_txt);
-  const txtContent = txtResponse.data; */
   for (const url of urls) {
     try {
-        // Fetch file content
-        const response = await axios.get(url);
-        const output = response.data
-        // console.log(`output:${output}`);
-        // output.data.cid = cid;
-       
-
-        /*     const dataToFetch = `https://${cid}.ipfs.w3s.link/data.txt`; */
-
-        /*     try {
-          const response = await axios.get(dataToFetch);
-          const content = response.data;
-          output.data.pagedata = content;
-        } catch (error) {
-          console.error("Error fetching content:", error);
-        } */
-
-        return output;
-      } catch (error) {
-        console.error("ERROR", error);
+      const response = await axios.get(url, {
+        timeout: 280000 
+      });      
+      if (response.status === 200 || response.status === 304 ) {
+        const dataList = response.data;
+        const extractedDataList = dataList.map(item => item.data);
+        // console.log(extractedDataList);
+        
+        return extractedDataList;
+      }
+  } catch (error) {
+    console.error(`Error fetching URL: ${url}`, error.message);
+        return null
       }
 
   }
-
   
 };

@@ -16,8 +16,8 @@ async function saveTweetsToMongoDB(tweetList) {
     await collection.createIndex({ "tweets_id": 1 }, { unique: true });
 
     for (let tweet of tweetList) {
-      const filter = { "tweets_id": tweet.data.tweets_id };
-      const update = { $setOnInsert: tweet.data };
+      const filter = { "tweets_id": tweet.tweets_id };
+      const update = { $setOnInsert: tweet };
       const options = { upsert: true };
 
       await collection.updateOne(filter, update, options);
