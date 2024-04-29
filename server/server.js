@@ -1,40 +1,41 @@
 const express = require('express');
 const axios = require('axios');
+const getTaskData = require('../helpers/getTaskData'); 
+require('dotenv').config();
 const app = express();
 const port = 3000;
 
-app.post('/login', (req, res) => {
-  axios.post('https://api.example.com/login', {
-      username: 'your_username',
-      password: 'your_password'
-  })
-  .then(response => {
-      const session = response.data.session;
-      console.log('Session obtained:', session);
-      res.json({ session }); 
-  })
-  .catch(error => {
-      console.error('Login failed:', error);
-      res.status(500).send('Login failed'); 
-  });
+app.use(express.json()); 
+
+
+app.get('/keywords', async (req, res) => {
+  try {
+    const response = await axios.get('http://localhost:3000/keywords');
+    res.json({ keyword: response.data.keyword });
+  } catch (error) {
+    console.log(
+      'No Keywords from middle server, loading local keywords.json',
+    );
+    const wordsList = require('./keywords.json');
+    const randomIndex = Math.floor(Math.random() * wordsList.length);
+    res.json({ keyword:wordsList[randomIndex]});
+  }
 });
 
-app.post('/search', (req, res) => {
-  const { session, query } = req.body;
-  axios.post('https://api.example.com/search', {
-      session,
-      query
-  })
-  .then(response => {
-      const searchResults = response.data.results;
-      console.log('Search results:', searchResults);
-      res.json({ searchResults }); 
-  })
-  .catch(error => {
-      console.error('Error searching:', error);
-      res.status(500).send('Error searching'); 
-  });
+app.get('/get-current-task-data', async (req, res) => {
+  try {
+    const taskID = process.env.TASK_ID;
+    const round = 0;
+    const taskData = await getTaskData(taskID, round);
+    res.json({ taskData });
+  } catch (error) {
+    console.error('Error fetching task data:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
+
+
+
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

@@ -1,10 +1,10 @@
 const dataFromCid = require('../helpers/dataFromCid');
 
 async function testDataFromCid() {
-  const cid = 'bafybeiasctreqp3a7obt5oh6h3lm4dmh2hdahu5lrnohgd4o4d4tpnsdgm';
-
+  const cid = 'bafybeieuhjtch4diltzkh3twb2xxj55nnegumkxzbqxced6r6rz6xlmdlm';
+  const fileName = 'dataList.json'
   try {
-    const data = await dataFromCid(cid);
+    const data = await dataFromCid(cid, fileName);
     console.log('Retrieved data:', data);
   } catch (error) {
     console.error('Error retrieving data:', error);

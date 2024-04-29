@@ -9,7 +9,7 @@ async function saveTweetsToMongoDB(tweetList) {
   try {
     await client.connect();
     console.log("Connected to MongoDB.");
-    const db = client.db("Twitter-test");
+    const db = client.db("Twitter");
     const collection = db.collection("tweets");
 
     // Create a unique index on the 'tweets_id' field to prevent duplicate entries

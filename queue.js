@@ -39,13 +39,14 @@ async function queuePost(tweetList, i) {
   return true;
 }
 
+//Read data from CID queue and process it
 async function queueCID(submissionList,batchSize = BATCH_SIZE) {
-  console.log("submissionList,fromquue",submissionList);
+  // console.log("submissionList",submissionList);
+  
   // Helper function to process items in a queue
   async function processInQueue(queue, items, processFunc,totalItems) {
     let iterationNumber = 0;
     let promises = [];
-    /*     console.log(items); */
     for (let item of items) {
       promises.push(
         queue.run(async () => {
@@ -54,7 +55,7 @@ async function queueCID(submissionList,batchSize = BATCH_SIZE) {
             console.log(`${totalProcessedItems + iterationNumber} out of ${totalItems}`);
             const result = await processFunc(item);
             if (result === null) {
-              console.error(`Processing failed for item with CID: ${item}`);
+              // console.error(`Processing failed for item with CID: ${item}`);
             }
             return result;
           } catch (e) {
@@ -70,12 +71,10 @@ async function queueCID(submissionList,batchSize = BATCH_SIZE) {
   console.log("Extracting submission data...");
   if (submissionList && Array.isArray(submissionList)) {
     console.log("Latest round has", submissionList.length, "submissions.");
-    // ...
   } else {
     console.error("submissionList is not a valid array:", submissionList);
     return [];
   }
-  // console.log("Latest round has", submissionList.length, "submissions.");
 
   const submissionQ = new Queue(5, 100);
   const results = [];
@@ -99,31 +98,12 @@ async function queueCID(submissionList,batchSize = BATCH_SIZE) {
 
   return results;
 
-
-  // // Use queue to process each CID submission
-  // const tweetDataArrays = await processInQueue(
-  //   submissionQ,
-  //   submissionList,
-  //   readSubmission
-  // );
-
-  // // Filter out any null values (from errors) and flatten the list if needed
-  // const flatTweetList = tweetDataArrays.filter(Boolean).flat();
-
-  // console.log(`Data wait to be extracted and POST: ${flatTweetList.length}`);
-  // console.log("Extracting tweets data");
-
-  // // const cidQ = new Queue(40, 30);
-
-  // // const tweetList = await processInQueue(cidQ, cidDataRawList, readCID);
-
-
-  // return flatTweetList;
 }
 
+//Read Twitter data based on CID
 async function readSubmission(cid) {
-  // console.log(cid);
-  let tweetData = await dataFromCid(cid);
+  const fileName = 'dataList.json'
+  let tweetData = await dataFromCid(cid,fileName);
   // console.log('Data for CID:', cid, tweetData); 
   return tweetData;
 }

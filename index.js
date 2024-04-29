@@ -28,12 +28,14 @@ async function main() {
   if (round < taskData.maxRound) {
     round = taskData.maxRound;
     console.log("Current round is", round, "...");
+    
     // Extract tweets from IPFS
-
     const submissionList = taskData.submissions
-    //handle data and sve to mongodb
+
+    //Batch processing of Twitter data
     const tweetList = await queueCID(submissionList);
-    // console.log(taskData.submissions);
+    
+    // console.log(tweetList);
     // await saveTweetsToMongoDB(tweetList);
 
     

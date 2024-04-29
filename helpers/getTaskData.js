@@ -47,7 +47,7 @@ async function getTaskData(taskID, round) {
   return {
     submissions: submissionList,
     maxRound: maxRound,
-    roundTime: taskState.round_time,
+    roundTime: taskState.round_time
   };
 }
 module.exports = getTaskData;
