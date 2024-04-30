@@ -7,26 +7,14 @@ const port = 3000;
 
 app.use(express.json()); 
 
-const keywords = require('./keywords.json');
+const defaultKeyword = 'halifax';
+
+
 app.get('/keywords', (req, res) => {
-  res.json({ keywords });
+  const keyword = req.query.keyword || defaultKeyword;
+  res.send(keyword);
 });
 
-app.get('/keyword', async (req, res) => {
-  try {
-    const response = await axios.get('http://localhost:3000/keywords');
-    const wordsList = response.data.keywords;
-    const randomIndex = Math.floor(Math.random() * wordsList.length);
-    res.json({ keyword: wordsList[randomIndex] });
-  } catch (error) {
-    console.log(
-      'No Keywords from middle server, loading local keywords.json',
-    );
-    const wordsList = require('./keywords.json');
-    const randomIndex = Math.floor(Math.random() * wordsList.length);
-    res.json({ keyword:wordsList[randomIndex]});
-  }
-});
 
 app.post('/add-keyword', (req, res) => {
   const { keyword } = req.body;
@@ -40,7 +28,7 @@ app.post('/add-keyword', (req, res) => {
 });
 
 
-app.get('/get-current-task-data', async (req, res) => {
+app.get('/taskstate', async (req, res) => {
   try {
     const taskID = process.env.TASK_ID;
     const round = 0;
@@ -51,6 +39,23 @@ app.get('/get-current-task-data', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+//
+app.post('/api/getdata', async (req, res) => {
+  const data = req.body; 
+  console.log('Received data from Twitter crawler:', data);
+  res.send(data)
+
+  try {
+      // assume have a function can process data from task
+      // await saveTweetsToMongoDB(data);
+      res.status(200).json({ message: 'Data received successfully' });
+  } catch (error) {
+      console.error('Error processing data:', error);
+      res.status(500).json({ error: 'Failed to process data' });
+  }
+});
+
 
 app.post('/request-update', async (req, res) => {
   try {

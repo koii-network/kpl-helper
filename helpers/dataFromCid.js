@@ -1,6 +1,7 @@
 const axios = require('axios');
 const getDataFromWeb3Storage = require('../helpers/dataFromCid-web3');
 
+// fetch data from a given URL
 async function fetchData(url) {
   try {
     const response = await axios.get(url, {
@@ -16,7 +17,8 @@ async function fetchData(url) {
   return null;
 }
 
-module.exports = async (cid, fileName, maxRetries = 1, retryDelay = 3000) => {
+// Main function to fetch data based on CID and filename
+module.exports = async (cid, fileName, maxRetries = 2, retryDelay = 3000) => {
   const urls = [
     `https://cloudflare-ipfs.com/ipfs/${cid}/${fileName}`,
     `https://${cid}.ipfs.sphn.link/${fileName}`,
@@ -37,7 +39,8 @@ module.exports = async (cid, fileName, maxRetries = 1, retryDelay = 3000) => {
 
   return null
 
-  // If all retries fail, try getting data from the backup function
-  // console.log("All attempts failed, trying backup method...");
-  // return await getDataFromWeb3Storage(cid, fileName) || null;
+  /* 
+  //If all retries fail, not sure the file name, try getting data from the backup function
+  console.log("All attempts failed, trying backup method...");
+  return await getDataFromWeb3Storage(cid, fileName) || null; */
 };

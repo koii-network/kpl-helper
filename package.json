@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dockerize": "docker build -t yigitkoii/twitter_task_middleman . && docker push yigitkoii/twitter_task_middleman",
-    "server": "node tests/testIndex.js",
+    "server": "node tests/testSaveTweetsToMango.js",
     "test": "jest"
   },
   "author": "",

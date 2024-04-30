@@ -2,9 +2,9 @@ const { Queue } = require("async-await-queue");
 const sendTweet = require("./api/sendTweet");
 const dataFromCid = require("./helpers/dataFromCid");
 const saveTweetsToMongoDB = require("./api/saveTweetsToMongoDB");
+require("dotenv").config();
 
-const BATCH_SIZE = 10;
-
+const BATCH_SIZE = parseInt(process.env.BATCH_SIZE, 10) || 10; // Default to 10 if not set
 
 async function queuePost(tweetList, i) {
   // Create a queue with a concurrency of 5
@@ -22,6 +22,7 @@ async function queuePost(tweetList, i) {
       continue;
     }
 
+    // Process each tweet with controlled concurrency  
     count.push(
       postQ.run(() =>
         sendTweet(tweet, i++).catch((e) => {
@@ -35,19 +36,32 @@ async function queuePost(tweetList, i) {
     // Add the tweet's URL to the sent tweets set
     sentTweetUrls.add(tweet.url);
   }
+
+  // Wait for all tweet postings to finish
   await Promise.all(count);
   return true;
 }
 
-//Read data from CID queue and process it
+//process submissions from CID in batches
 async function queueCID(submissionList,batchSize = BATCH_SIZE) {
   // console.log("submissionList",submissionList);
   
+  console.log("Extracting submission data...");
+  if (submissionList && Array.isArray(submissionList)) {
+    console.log("Latest round has", submissionList.length, "submissions.");
+  } else {
+    console.error("Invalid submission list provided:", submissionList);
+    return [];
+  }
+
   // Helper function to process items in a queue
   async function processInQueue(queue, items, processFunc,totalItems) {
     let iterationNumber = 0;
     let promises = [];
+    
+    // Iterate over each item in the provided list
     for (let item of items) {
+      // Add to the queue the processing of each item wrapped in an async function
       promises.push(
         queue.run(async () => {
           try {
@@ -65,16 +79,11 @@ async function queueCID(submissionList,batchSize = BATCH_SIZE) {
         })
       );
     }
+    // Wait for all promises to resolve and return the results
     return Promise.all(promises);
   }
 
-  console.log("Extracting submission data...");
-  if (submissionList && Array.isArray(submissionList)) {
-    console.log("Latest round has", submissionList.length, "submissions.");
-  } else {
-    console.error("submissionList is not a valid array:", submissionList);
-    return [];
-  }
+
 
   const submissionQ = new Queue(5, 100);
   const results = [];
@@ -85,6 +94,8 @@ async function queueCID(submissionList,batchSize = BATCH_SIZE) {
     const remainingItems = submissionList.slice(totalProcessedItems, totalProcessedItems + batchSize);
     const batchResults = await processInQueue(submissionQ, remainingItems, readSubmission, submissionList.length);
     const filteredResults = batchResults.filter(Boolean).flat();
+
+        // Save processed tweets to MongoDB
 
     await saveTweetsToMongoDB(filteredResults);
 

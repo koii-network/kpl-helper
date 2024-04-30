@@ -79,6 +79,7 @@ module.exports = async (cid) => {
   // Get file info
   const file = await res.files();
 
+  //Define URLs for accessing the file via different IPFS gateways
   const urls = [
     `https://cloudflare-ipfs.com/ipfs/${file[0].cid}/${file[0].name}`,
     `https://${file[0].cid}.ipfs.w3s.link/?filename=${file[0].name}`,
@@ -87,7 +88,7 @@ module.exports = async (cid) => {
     `https://${file[0].cid}.ipfs.sphn.link/${file[0].cid}`
   ];
   
-
+  // Try to fetch the file from IPFS gateways
   for (const url of urls) {
     try {
       const response = await axios.get(url, {
