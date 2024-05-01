@@ -49,7 +49,7 @@ npm install
 npm run start
 ```
 
-This will start the process of fetching tweets and posting them to the configured server.
+This will start the process of fetching tweets, save them to mongoDB and posting them to the configured server.
 
 To test the project, you can use the following command:
 
