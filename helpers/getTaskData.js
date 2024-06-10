@@ -1,7 +1,7 @@
 const { Connection, PublicKey } = require("@_koi/web3.js");
 
 async function getTaskData(taskID, round) {
-  const connection = new Connection("https://testnet.koii.live");
+  const connection = new Connection("https://testnet.koii.network");
 
   // Check if TASK_ID is defined
   if (!taskID) {
@@ -47,8 +47,7 @@ async function getTaskData(taskID, round) {
   return {
     submissions: submissionList,
     maxRound: maxRound,
-    roundTime: taskState.round_time,
+    roundTime: taskState.round_time
   };
 }
-
 module.exports = getTaskData;

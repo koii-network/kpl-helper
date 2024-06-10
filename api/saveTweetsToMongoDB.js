@@ -1,31 +1,33 @@
 const { MongoClient } = require("mongodb");
 const axios = require("axios");
-require("dotenv").config({ path: "../.env" });
+require("dotenv").config();
+
 const DB_KEY = process.env.DB_KEY;
 
 async function saveTweetsToMongoDB(tweetList) {
-  let localtl = tweetList;
-  const client = new MongoClient(DB_KEY);
+ const client = new MongoClient(DB_KEY);
 
   try {
-    /*     const txtResponse = await axios.get(
-      "https://bafybeigvqiiahfaiur2ckwnnnuqt2uhzmdjmjoymt4xgwuj6naniksgyli.ipfs.w3s.link/data.txt"
-    );
-    const txtContent = txtResponse.data;
-    localtl.forEach((obj) => {
-      obj.tweet = txtContent;
-    }); */
     await client.connect();
-    const db = client.db("Twitter");
-    const collection = db.collection("Tweets_November");
-    try {
-      const result = await collection.insertMany(localtl);
-    } catch (error) {
-      console.error(
-        "Error occurred during insertMany operation. (Potentially, a duplicate key is rejected)"
-      );
+    console.log("Connected to MongoDB.");
+
+    // Select the collection and database by name from environment variables
+    const db = client.db(process.env.DB_NAME);
+    const collection = db.collection(process.env.COLLECTION_NAME);
+
+    // Create a unique index on the 'tweets_id' field to prevent duplicate entries
+    await collection.createIndex({ "tweets_id": 1 }, { unique: true });
+
+    // Loop over each tweet in the list
+    for (let tweet of tweetList) {
+      const filter = { "tweets_id": tweet.tweets_id };
+      const update = { $set: tweet }; // Update tweet data or insert new if it doesn't exist
+      const options = { upsert: true };
+
+      await collection.updateOne(filter, update, options);
     }
-    console.log("Data inserted.");
+
+    console.log(`${tweetList.length} tweets inserted/updated.`);
   } catch (err) {
     console.error("Error:", err);
   } finally {
@@ -33,5 +35,5 @@ async function saveTweetsToMongoDB(tweetList) {
   }
 }
 
-//Default Export
+
 module.exports = saveTweetsToMongoDB;

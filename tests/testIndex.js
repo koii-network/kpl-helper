@@ -1,28 +1,21 @@
-const dataFromCid = require("../helpers/dataFromCid");
-const { queuePost } = require("../queue");
+const { queueCID } = require('../queue');
 
-async function main() {
-  let tweetList = [];
 
-  // Create an empty list to store the extracted tweets
-  let data = {
-    id: "https://twitter.com/rilbin_phegis/status/1688688400319074305",
-    round: 156,
-    cid: "bafybeicxfoyxhrydokjp4vpr5led4gy7yfvxchm4qi3ijgqbsvujlvnsgq",
-    _id: "3SX4HaXHEyCU08Ar",
-  };
+async function testQueueCID() {
+  const submissionList = [
+      "bafybeihbyadzr3bth45xu4r3i4ivrax3lp3v5d2adkwrnsnld2fmf4jmri",
+      "bafybeiccwiwkkbj7vxonpj4ahphoaipn22ohe3vqe2qhe7t7uhtlzz2gbe"
+  ]; 
 
-  // Iterate through the submission list and extract the data
+  try {
+      const tweetData = await queueCID(submissionList);
+      console.log('Test tweetData:', tweetData);
+      console.log("length", tweetData.length);
 
-  let tweetDataRaw = await dataFromCid(data.cid);
-  tweetList.push(tweetDataRaw.data);
-
-  tweetList = tweetList.flat();
-  // console.log(tweetList);
-  let i = 0;
-  // POST data to server
-  let result = await queuePost(tweetList, i);
-  console.log(result);
+  } catch (error) {
+      console.error('Test Failed:', error);
+  }
 }
 
-main();
+
+testQueueCID();

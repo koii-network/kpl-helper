@@ -1,8 +1,10 @@
 const { Queue } = require("async-await-queue");
 const sendTweet = require("./api/sendTweet");
 const dataFromCid = require("./helpers/dataFromCid");
+const saveTweetsToMongoDB = require("./api/saveTweetsToMongoDB");
+require("dotenv").config();
 
-const BATCH_SIZE = 10;
+const BATCH_SIZE = parseInt(process.env.BATCH_SIZE, 10) || 10; // Default to 10 if not set
 
 async function queuePost(tweetList, i) {
   // Create a queue with a concurrency of 5
@@ -20,6 +22,7 @@ async function queuePost(tweetList, i) {
       continue;
     }
 
+    // Process each tweet with controlled concurrency  
     count.push(
       postQ.run(() =>
         sendTweet(tweet, i++).catch((e) => {
@@ -33,67 +36,91 @@ async function queuePost(tweetList, i) {
     // Add the tweet's URL to the sent tweets set
     sentTweetUrls.add(tweet.url);
   }
+
+  // Wait for all tweet postings to finish
   await Promise.all(count);
   return true;
 }
 
-async function queueCID(submissionList) {
+//process submissions from CID in batches
+async function queueCID(submissionList,batchSize = BATCH_SIZE) {
+  // console.log("submissionList",submissionList);
+  
+  console.log("Extracting submission data...");
+  if (submissionList && Array.isArray(submissionList)) {
+    console.log("Latest round has", submissionList.length, "submissions.");
+  } else {
+    console.error("Invalid submission list provided:", submissionList);
+    return [];
+  }
+
   // Helper function to process items in a queue
-  async function processInQueue(queue, items, processFunc) {
+  async function processInQueue(queue, items, processFunc,totalItems) {
     let iterationNumber = 0;
     let promises = [];
-    /*     console.log(items); */
+    
+    // Iterate over each item in the provided list
     for (let item of items) {
+      // Add to the queue the processing of each item wrapped in an async function
       promises.push(
         queue.run(async () => {
           try {
             iterationNumber++;
-            console.log(iterationNumber, "out of", items.length);
-            return await processFunc(item);
+            console.log(`${totalProcessedItems + iterationNumber} out of ${totalItems}`);
+            const result = await processFunc(item);
+            if (result === null) {
+              // console.error(`Processing failed for item with CID: ${item}`);
+            }
+            return result;
           } catch (e) {
-            console.error(e);
-            return null; // Return null if an error occurs
+            console.error("Error processing item:", item, "Error:", e);
+            return null; 
           }
         })
       );
     }
+    // Wait for all promises to resolve and return the results
     return Promise.all(promises);
   }
 
-  console.log("Extracting submission data...");
-  console.log("Latest round has", submissionList.length, "submissions.");
+
 
   const submissionQ = new Queue(5, 100);
-  const submissionDataRawList = await processInQueue(
-    submissionQ,
-    submissionList,
-    readSubmission
-  );
-  const cidDataRawList = submissionDataRawList.filter(Boolean).flat();
+  const results = [];
+  let totalProcessedItems = 0;
 
-  console.log(`Data wait to be extracted and POST: ${cidDataRawList.length}`);
+
+  while (totalProcessedItems < submissionList.length) {
+    const remainingItems = submissionList.slice(totalProcessedItems, totalProcessedItems + batchSize);
+    const batchResults = await processInQueue(submissionQ, remainingItems, readSubmission, submissionList.length);
+    const filteredResults = batchResults.filter(Boolean).flat();
+
+        // Save processed tweets to MongoDB
+
+    await saveTweetsToMongoDB(filteredResults);
+
+    results.push(...filteredResults);
+    totalProcessedItems += remainingItems.length;
+    console.log("Total items processed:", totalProcessedItems, "out of", submissionList.length);
+  }
+
+  console.log(`Total tweets extracted and saved: ${results.length}`);
   console.log("Extracting tweets data");
 
-  const cidQ = new Queue(40, 30);
+  return results;
 
-  const tweetList = await processInQueue(cidQ, cidDataRawList, readCID);
-
-  // Filter out any null values (from errors) and flatten the list if needed
-  const flatTweetList = tweetList.filter(Boolean).flat();
-
-  return flatTweetList;
 }
 
-async function readCID(data) {
-  // console.log(data);
-  let tweetDataRaw = await dataFromCid(data.cid);
-  return tweetDataRaw.data;
+//Read Twitter data based on CID
+async function readSubmission(cid) {
+  const fileName = 'dataList.json'
+  let tweetData = await dataFromCid(cid,fileName);
+  // console.log('Data for CID:', cid, tweetData); 
+  return tweetData;
 }
 
-async function readSubmission(submission) {
-  // console.log(submission);
-  let submissionDataRaw = await dataFromCid(submission);
-  return submissionDataRaw.data;
-}
 
-module.exports = { queuePost, queueCID };
+module.exports = {
+  queuePost,
+  queueCID
+};
