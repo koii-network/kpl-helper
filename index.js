@@ -35,14 +35,6 @@ async function main() {
     //Batch processing of Twitter data
     const tweetList = await queueCID(submissionList);
     
-    // console.log(tweetList);
-    // await saveTweetsToMongoDB(tweetList);
-
-    
-
-    /*     // POST data to server
-    let i = 0;
-    let result = await queuePost(tweetList, i); */
     console.log("Operation complete, calling the function again.");
     main();
   } else {
