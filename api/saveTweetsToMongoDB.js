@@ -1,19 +1,24 @@
 const { MongoClient } = require("mongodb");
-const axios = require("axios");
 require("dotenv").config();
 
 const DB_KEY = process.env.DB_KEY;
 const DB_NAME = process.env.DB_NAME;
 const COLLECTION_NAME = process.env.COLLECTION_NAME;
 
-async function saveTweetsToMongoDB(tweetList) {
- const client = new MongoClient(DB_KEY);
+let client;
 
-  try {
+async function connectToMongoDB() {
+  if (!client) {
+    client = new MongoClient(DB_KEY, { useNewUrlParser: true, useUnifiedTopology: true });
     await client.connect();
     console.log("Connected to MongoDB.");
+  }
+  return client;
+}
 
-    // Select the collection and database by name from environment variables
+async function saveTweetsToMongoDB(tweetList) {
+  try {
+    const client = await connectToMongoDB();
     const db = client.db(DB_NAME);
     const collection = db.collection(COLLECTION_NAME);
 
@@ -32,10 +37,7 @@ async function saveTweetsToMongoDB(tweetList) {
     console.log(`${tweetList.length} tweets inserted/updated.`);
   } catch (err) {
     console.error("Error:", err);
-  } finally {
-    await client.close();
   }
 }
-
 
 module.exports = saveTweetsToMongoDB;
