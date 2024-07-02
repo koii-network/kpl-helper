@@ -1,14 +1,15 @@
 //Imports
 const getTaskData = require("./helpers/getTaskData");
-const { queuePost, queueCID } = require("./queue");
+const { queueCID } = require("./queue");
 require("dotenv").config();
-const saveTweetsToMongoDB = require("./api/saveTweetsToMongoDB");
 
 let round = 0;
 const taskId = process.env.TASK_ID;
 
 
-
+/**
+ * Main function to retry the task data fetch until a new round is found
+ */
 async function main() {
   const getTaskDataWrapper = async (taskId, round) => {
     let wrappedTaskData = await getTaskData(taskId, round);
@@ -23,16 +24,10 @@ async function main() {
 
   const taskData = await getTaskDataWrapper(taskId, round);
 
-  
-
   if (round < taskData.maxRound) {
     round = taskData.maxRound;
     console.log("Current round is", round, "...");
-    
-    // Extract tweets from IPFS
     const submissionList = taskData.submissions
-
-    //Batch processing of Twitter data
     const tweetList = await queueCID(submissionList);
     
     console.log("Operation complete, calling the function again.");
