@@ -44,8 +44,6 @@ async function queuePost(tweetList, i) {
 
 //process submissions from CID in batches
 async function queueCID(submissionList,batchSize = BATCH_SIZE) {
-  // console.log("submissionList",submissionList);
-  
   console.log("Extracting submission data...");
   if (submissionList && Array.isArray(submissionList)) {
     console.log("Latest round has", submissionList.length, "submissions.");
@@ -69,7 +67,7 @@ async function queueCID(submissionList,batchSize = BATCH_SIZE) {
             console.log(`${totalProcessedItems + iterationNumber} out of ${totalItems}`);
             const result = await processFunc(item);
             if (result === null) {
-              // console.error(`Processing failed for item with CID: ${item}`);
+              console.error(`Processing failed for item with CID: ${item}`);
             }
             return result;
           } catch (e) {
@@ -113,10 +111,14 @@ async function queueCID(submissionList,batchSize = BATCH_SIZE) {
 
 //Read Twitter data based on CID
 async function readSubmission(cid) {
-  const fileName = 'dataList.json'
-  let tweetData = await dataFromCid(cid,fileName);
-  // console.log('Data for CID:', cid, tweetData); 
-  return tweetData;
+  try {
+    const fileName = 'dataList.json'
+    let tweetData = await dataFromCid(cid,fileName);
+    return tweetData;
+  } catch (e) {
+    console.error("Error processing CID:", cid, "Error:", e);
+    return null;
+  }
 }
 
 
