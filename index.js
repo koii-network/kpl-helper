@@ -11,6 +11,7 @@ const taskId = process.env.TASK_ID;
  * Main function to retry the task data fetch until a new round is found
  */
 async function main() {
+
   const getTaskDataWrapper = async (taskId, round) => {
     let wrappedTaskData = await getTaskData(taskId, round);
     if (wrappedTaskData === false) {
@@ -21,7 +22,7 @@ async function main() {
       return wrappedTaskData;
     }
   };
-
+  
   const taskData = await getTaskDataWrapper(taskId, round);
 
   if (round < taskData.maxRound) {

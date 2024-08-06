@@ -83,7 +83,7 @@ async function queueCID(submissionList,batchSize = BATCH_SIZE) {
 
 
 
-  const submissionQ = new Queue(5, 100);
+  const submissionQ = new Queue(1, 2000);
   const results = [];
   let totalProcessedItems = 0;
 
@@ -92,10 +92,6 @@ async function queueCID(submissionList,batchSize = BATCH_SIZE) {
     const remainingItems = submissionList.slice(totalProcessedItems, totalProcessedItems + batchSize);
     const batchResults = await processInQueue(submissionQ, remainingItems, readSubmission, submissionList.length);
     const filteredResults = batchResults.filter(Boolean).flat();
-
-        // Save processed tweets to MongoDB
-
-    await saveTweetsToMongoDB(filteredResults);
 
     results.push(...filteredResults);
     totalProcessedItems += remainingItems.length;
@@ -114,6 +110,7 @@ async function readSubmission(cid) {
   try {
     const fileName = 'dataList.json'
     let tweetData = await dataFromCid(cid,fileName);
+        await saveTweetsToMongoDB(tweetData);
     return tweetData;
   } catch (e) {
     console.error("Error processing CID:", cid, "Error:", e);
