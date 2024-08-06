@@ -47,7 +47,7 @@ app.get('/taskstate', async (req, res) => {
 
 //receive data from task
 let storedData = []; 
-app.post('/api/getdata', async (req, res) => {
+app.post('/api/putdata', async (req, res) => {
   const data = req.body; 
   console.log('Received data from Twitter crawler:', data);
   storedData.push(data); 

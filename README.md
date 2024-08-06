@@ -68,17 +68,23 @@ npm run server
 This starts the server and makes it available for receiving and processing data according to configured tasks.
 
 ## Functions
-
+### index.js
+- **main()**: Keeps looping to get the latest task data and send it to queue.js to process
+### queue.js
+- **queueCID(submissionList)**
+  - Parameters:
+    - **submissionList**: An array of submission data including CIDs.
+  - Description: Extracts tweet data from IPFS using the provided CIDs.
 - **queuePost(tweetList, i)**
   - Parameters:
     - **tweetList**: An array of tweet data.
     - **i**: An index used for tracking the process.
   - Description: Handles the queuing and sending of tweets to the server.
-- **queueCID(submissionList)**
-  - Parameters:
-    - **submissionList**: An array of submission data including CIDs.
-  - Description: Extracts tweet data from IPFS using the provided CIDs.
-
+### helpers/getTaskData.js
+- **getTaskData(taskID, round)**: Gets the task Data and wait for new round to load
+### helpers/dataFromCid.js
+- **dataFromCid(cid, filename)**: Gets the content from both IPFS Storage SDK and direct accessing (as backup)
+  
 ## Note
 
 Make sure that the server is configured to receive the data in the expected format and that all necessary headers, tokens, and timeouts are properly set.

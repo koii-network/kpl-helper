@@ -1,46 +1,47 @@
 const axios = require('axios');
-const getDataFromWeb3Storage = require('../helpers/dataFromCid-web3');
+const { KoiiStorageClient } = require('@_koii/storage-task-sdk');
+const storageClient = new KoiiStorageClient(undefined,undefined, false);
 
-// fetch data from a given URL
-async function fetchData(url) {
-  try {
-    const response = await axios.get(url, {
-      timeout: 530000 
-    });       if (response.status === 200 || response.status === 304) {
-      return response.data.map(item => item.data); 
-    } else {
-      console.log(`Received status ${response.status} for URL ${url}`);
+async function fetchCidFromGetFile(cid, fileName) {
+    try{
+        const blob = await storageClient.getFile(cid, fileName);
+        console.log(blob);
+        const text = await blob.text(); // Convert Blob to text
+        const data = JSON.parse(text); // Parse text to JSON
+        return data;
+    } catch (error) {
+        console.log(`Failed for CID ${cid}: ${error.message}`);
+        return null;
     }
-  } catch (error) {
-    // console.log(`Failed for URL ${url}: ${error.message}`);
-  }
-  return null;
 }
 
-// Main function to fetch data based on CID and filename
+async function directFetchCid(cid, fileName) {
+    try {
+        const response = await axios.get(`https://ipfs-gateway.koii.live/ipfs/${cid}/${fileName}`, {
+          timeout: 530000 
+        });       
+        if (response.status === 200 || response.status === 304) {
+            console.log()
+          return response.data.map(item => item.data); 
+        } else {
+          console.log(`Received status ${response.status} for URL ${url}`);
+        }
+      } catch (error) {
+        console.log(`Failed for CID ${cid}: ${error.message}`);
+      }
+      return null;
+}
+
 module.exports = async (cid, fileName, maxRetries = 2, retryDelay = 3000) => {
-  const urls = [
-    `https://cloudflare-ipfs.com/ipfs/${cid}/${fileName}`,
-    `https://${cid}.ipfs.sphn.link/${fileName}`,
-    `https://${cid}.ipfs.w3s.link/${fileName}`,
-    `https://${cid}.ipfs.dweb.link/${fileName}`,
-    `https://ipfs.io/ipfs/${cid}/${fileName}`,
-  ];
-
-  let attempts = 0;
-  while (attempts < maxRetries) {
-    let promises = urls.map(url => fetchData(url));
-    let result = await Promise.race(promises.filter(p => p !== null));
-    if (result) return result;
-    attempts++;
-    // console.log(`Attempt ${attempts}: Retrying after ${retryDelay / 1000} seconds...`);
-    await new Promise(resolve => setTimeout(resolve, retryDelay));
-  }
-
-  return null
-
-  /* 
-  //If all retries fail, not sure the file name, try getting data from the backup function
-  console.log("All attempts failed, trying backup method...");
-  return await getDataFromWeb3Storage(cid, fileName) || null; */
+    // Get data from IPFS through Koii Storage getCID function
+    const data = await fetchCidFromGetFile(cid, fileName);
+    if (data) {
+        return data;
+    }
+    
+    // Get data from IPFS through our direct fetch from IPFS Gateway [Not Recommended]
+    const dataDirect = await directFetchCid(cid, fileName);
+    if (dataDirect) {
+        return dataDirect;
+    }
 };
