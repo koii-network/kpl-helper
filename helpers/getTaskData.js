@@ -1,4 +1,4 @@
-const { Connection, PublicKey } = require("@_koi/web3.js");
+const { Connection, PublicKey } = require("@_koii/web3.js");
 
 async function getTaskData(taskID, round) {
   const connection = new Connection("https://testnet.koii.network");

@@ -9,7 +9,10 @@ let client;
 
 async function connectToMongoDB() {
   if (!client) {
-    client = new MongoClient(DB_KEY, { useNewUrlParser: true, useUnifiedTopology: true });
+    client = new MongoClient(DB_KEY, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     await client.connect();
     console.log("Connected to MongoDB.");
   }
@@ -22,19 +25,45 @@ async function saveTweetsToMongoDB(tweetList) {
     const db = client.db(DB_NAME);
     const collection = db.collection(COLLECTION_NAME);
 
-    // Create a unique index on the 'tweets_id' field to prevent duplicate entries
-    await collection.createIndex({ "tweets_id": 1 }, { unique: true });
+    // Create a unique index on the 'data.tweets_id' field to prevent duplicate entries
+    // await collection.createIndex({ "_id": '' }, { unique: true });
 
     // Loop over each tweet in the list
     for (let tweet of tweetList) {
-      const filter = { "tweets_id": tweet.tweets_id };
-      const update = { $set: tweet }; // Update tweet data or insert new if it doesn't exist
-      const options = { upsert: true };
+      // Remove _id field if it exists
+      if (tweet._id) {
+        delete tweet._id;
+      }
 
-      await collection.updateOne(filter, update, options);
+      // console.log("Processing tweet:", tweet);
+      const { id, ...tweetData } = tweet;
+      const filter = { id: tweet.id }; // Filter by tweet ID
+      const update = { $set: tweetData }; // Update tweet data or insert new if it doesn't exist
+      const options = { upsert: true };
+      try {
+        const result = await collection.updateOne(filter, update, options);
+        if (result.upsertedCount > 0) {
+          console.log(`Inserted tweet with tweets_id ${tweet.id}`);
+        } else {
+          console.log(`Updated tweet with tweets_id ${tweet.id}`);
+        }
+      } catch (error) {
+        if (error.code === 11000) {
+          // Duplicate key error
+          console.error(
+            `Duplicate key error for tweets_id: ${tweet.id}`,
+            error
+          );
+        } else {
+          console.error(
+            `Error processing tweet with tweets_id: ${tweet.id}`,
+            error
+          );
+        }
+      }
     }
 
-    console.log(`${tweetList.length} tweets inserted/updated.`);
+    console.log(`${tweetList.length} tweets processed.`);
   } catch (err) {
     console.error("Error:", err);
   }
