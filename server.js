@@ -7,32 +7,63 @@ const port = 3000;
 
 app.use(express.json()); 
 
-//Custom keywords or randomly selected
+// Custom keywords or randomly selected
 const defaultKeyword = process.env.KEY_WORD;
+let pendingRequests = [];
 
 app.get('/keywords', (req, res) => {
   try {
-    let keyword = defaultKeyword;
+    const { stakingKey } = req.query;
 
-    if (!keyword) {
-      console.log(
-        'No Keywords from middle server, loading local keywords.json',
-      );
-      const wordsList = require('./keywords.json');
-      const randomIndex = Math.floor(Math.random() * wordsList.length);
-      keyword = wordsList[randomIndex]; // Load local JSON data
-      console.log("keywordfromjson",keyword);
+    if (!stakingKey) {
+      return res.status(400).send('stakingKey is required');
+    }
+
+    let keyword;
+
+    if (pendingRequests.length > 0) {
+      keyword = pendingRequests.shift(); // Get keyword from pendingRequests and remove it
+      console.log('Keyword from pendingRequests:', keyword);
+    } else {
+      keyword = defaultKeyword;
+      if (!keyword) {
+        console.log('No Keywords from middle server, loading local keywords.json');
+        const wordsList = require('./keywords.json');
+        const randomIndex = Math.floor(Math.random() * wordsList.length);
+        keyword = wordsList[randomIndex]; // Load local JSON data
+        console.log('Keyword from json:', keyword);
+      }
     }
     
     res.send(keyword);
-    
+
   } catch (error) {
     console.log('Error processing request:', error);
     res.status(500).send('Internal Server Error');
   }
 });
 
-//get taskstate from running task
+// Endpoint to add pending keywords
+app.post('/add-pending-keywords', (req, res) => {
+  try {
+    const { keywords } = req.body;
+
+    if (!keywords || !Array.isArray(keywords)) {
+      return res.status(400).send('Invalid input, array of keywords is required');
+    }
+
+    pendingRequests = pendingRequests.concat(keywords);
+    console.log('Pending requests updated:', pendingRequests);
+    
+    res.send('Keywords added to pending requests');
+
+  } catch (error) {
+    console.log('Error processing request:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// Get taskstate from running task
 app.get('/taskstate', async (req, res) => {
   try {
     const taskID = process.env.TASK_ID;
