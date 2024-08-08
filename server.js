@@ -4,20 +4,37 @@ const getTaskData = require("./helpers/getTaskData");
 require("dotenv").config();
 const app = express();
 const port = 3000;
-
+const getStakingKey = require("./helpers/getStakingKey");
+const cron = require("node-cron");
 app.use(express.json());
 
 // Custom keywords or randomly selected
 const defaultKeyword = process.env.KEY_WORD;
 let pendingRequests = [];
+let stakingKeyList = {};
+
+// Function to update stakingKeyList
+async function updateStakingKeyList() {
+  try {
+    stakingKeyList = await getStakingKey(process.env.TASK_ID);
+    // console.log("Updated stakingKeyList:", stakingKeyList);
+  } catch (error) {
+    console.error("Error updating stakingKeyList:", error);
+  }
+}
+
+// Run the updateStakingKeyList function immediately and then every 10 minutes
+updateStakingKeyList();
+cron.schedule("*/10 * * * *", updateStakingKeyList);
 
 app.get("/keywords", (req, res) => {
   try {
     console.log("Request received:", req.query);
     const stakingKey = req.query;
     console.log("Staking Key:", stakingKey.key);
-    if (!stakingKey) {
-      return res.status(400).send("stakingKey is required");
+    if (!stakingKey || !stakingKeyList[stakingKey.key]) {
+      console.log("Invalid stakingKey provided:", stakingKey);
+      return res.status(400).send(`Valid stakingKey is required or Not found, please run task ${process.env.TASK_ID} first.`);
     }
 
     let keyword;
@@ -29,7 +46,7 @@ app.get("/keywords", (req, res) => {
       keyword = defaultKeyword;
       if (!keyword) {
         console.log(
-          "No Keywords from middle server, loading local keywords.json"
+          "No Keywords from pending list, loading local keywords.json"
         );
         const wordsList = require("./keywords.json");
         const randomIndex = Math.floor(Math.random() * wordsList.length);
