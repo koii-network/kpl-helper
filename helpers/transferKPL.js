@@ -1,7 +1,7 @@
 const { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey } = require('@solana/web3.js');
 const { getOrCreateAssociatedTokenAccount, transfer } = require('@solana/spl-token');
 
-async function transferKPL(mintToken, targetWallet) {
+async function transferKPL(mintToken, targetWallet, amount) {
     // Connect to cluster
     const connection = new Connection("https://testnet.koii.network", 'confirmed');
 
@@ -31,7 +31,7 @@ async function transferKPL(mintToken, targetWallet) {
 
     // Mint 1 new token to the "fromTokenAccount" account we just created
 
-    const transferAmount = 50;
+    const transferAmount = amount;
 
 
     // Transfer the new token to the "toTokenAccount" we just created
