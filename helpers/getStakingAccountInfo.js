@@ -25,7 +25,7 @@ async function getStakingAccountInfo(stakingKey) {
             return null;
         }
     } else {
-        console.log("No transactions found for this account.");
+        console.log(`No transactions found for ${stakingKey}`);
     }
 }
 

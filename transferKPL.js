@@ -42,10 +42,10 @@ async function main() {
   const targetWalletList = ["HRw1QQ1siygapG7pmsFH3PGNs5YnD9a8sNsWRCmZoi8e"];
   await client.connect();
 
-//   const targetPublicAddress = await getStakingAccountInfo(
-//     "3JF13GJW2UeYuTTRJQBdBD9bHP6Zj1QLMyXBMoAP2r5Y"
-//   );
-//   console.log(targetPublicAddress);
+  //   const targetPublicAddress = await getStakingAccountInfo(
+  //     "3JF13GJW2UeYuTTRJQBdBD9bHP6Zj1QLMyXBMoAP2r5Y"
+  //   );
+  //   console.log(targetPublicAddress);
 
   const stakingList = await getStakingKey(
     "Aqr6jKpv7spkZ8TpLpEsLF5jvjNeHpaHaHPtkt4UTkn6"
@@ -53,7 +53,9 @@ async function main() {
   // Populate targetWalletList with the addresses from stakingList
   for (let walletAddress of Object.keys(stakingList)) {
     const targetPublicAddress = await getStakingAccountInfo(walletAddress);
-    targetWalletList.push(targetPublicAddress);
+    if (targetPublicAddress !== null) {
+      targetWalletList.push(targetPublicAddress);
+    }
   }
 
   console.log("Target Wallet Length:", targetWalletList.length);
