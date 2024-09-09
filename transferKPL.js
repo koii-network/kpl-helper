@@ -48,44 +48,46 @@ async function main() {
   //   console.log(targetPublicAddress);
 
   const stakingList = await getStakingKey(
-    "Aqr6jKpv7spkZ8TpLpEsLF5jvjNeHpaHaHPtkt4UTkn6"
+    "BVCsj5CGEMJ1sxLnyo6zqtdoWsiKL9S22SBTW89DG8Lp"
   );
   // Populate targetWalletList with the addresses from stakingList
   for (let walletAddress of Object.keys(stakingList)) {
-    const targetPublicAddress = await getStakingAccountInfo(walletAddress);
-    if (targetPublicAddress !== null) {
-      targetWalletList.push(targetPublicAddress);
-    }
+    targetWalletList.push(walletAddress);
   }
 
   console.log("Target Wallet Length:", targetWalletList.length);
 
-  //   try {
-  //     for (let i = 0; i < targetWalletList.length; i++) {
-  //       const walletAddress = targetWalletList[i];
-  //       const amount = 10; // Adjust the amount as needed
+    try {
+      for (let i = 0; i < targetWalletList.length; i++) {
+        const walletAddress = await getStakingAccountInfo(targetWalletList[i]);
+        if (!walletAddress) {
+          console.log(`No transactions found for ${targetWalletList[i]}`);
+          continue;
+        }
+        // const walletAddress = targetWalletList[i];
+        const amount = 10; // Adjust the amount as needed
 
-  //       // Check if this wallet and mint token already exists in the database
-  //       const exists = await checkExistingTransfer(mintToken, walletAddress, client);
-  //       if (exists) {
-  //         console.log(`Transfer to ${walletAddress} with ${mintToken} already exists, skipping...`);
-  //         continue;
-  //       }
+        // Check if this wallet and mint token already exists in the database
+        const exists = await checkExistingTransfer(mintToken, walletAddress, client);
+        if (exists) {
+          console.log(`Transfer to ${walletAddress} with ${mintToken} already exists, skipping...`);
+          continue;
+        }
 
-  //       // Perform the transfer
-  //       await transferKPL(mintToken, walletAddress, amount);
-  //       console.log(`Transferred ${amount} KPL to ${walletAddress}`);
+        // Perform the transfer
+        // await transferKPL(mintToken, walletAddress, amount);
+        console.log(`Transferred ${amount} KPL to ${walletAddress}`);
 
-  //       // Add the transfer details to MongoDB
-  //       await insertTransferRecord(mintToken, walletAddress, amount, client);
-  //       console.log(`Inserted transfer record for ${walletAddress} into MongoDB`);
+        // Add the transfer details to MongoDB
+        // await insertTransferRecord(mintToken, walletAddress, amount, client);
+        console.log(`Inserted transfer record for ${walletAddress} into MongoDB`);
 
-  //       // Delay for 5 seconds
-  //       await delay(5000);
-  //     }
-  //   } finally {
-  //     await client.close(); // Always ensure that the client is closed
-  //   }
+        // Delay for 5 seconds
+        await delay(5000);
+      }
+    } finally {
+      await client.close(); // Always ensure that the client is closed
+    }
 }
 
 main();
