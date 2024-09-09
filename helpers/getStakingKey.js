@@ -5,7 +5,7 @@ async function getStakingKey(taskID) {
 
   // Check if TASK_ID is defined
   if (!taskID) {
-    throw new Error("TASK_ID is not defined in the .env file");
+    throw new Error("TASK_ID is not defined");
   }
 
   const accountInfo = await connection.getAccountInfo(new PublicKey(taskID));
