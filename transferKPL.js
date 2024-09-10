@@ -42,11 +42,6 @@ async function main() {
   const targetWalletList = ["HRw1QQ1siygapG7pmsFH3PGNs5YnD9a8sNsWRCmZoi8e"];
   await client.connect();
 
-  //   const targetPublicAddress = await getStakingAccountInfo(
-  //     "3JF13GJW2UeYuTTRJQBdBD9bHP6Zj1QLMyXBMoAP2r5Y"
-  //   );
-  //   console.log(targetPublicAddress);
-
   const stakingList = await getStakingKey(
     "BVCsj5CGEMJ1sxLnyo6zqtdoWsiKL9S22SBTW89DG8Lp"
   );
