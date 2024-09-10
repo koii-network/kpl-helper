@@ -38,13 +38,13 @@ async function insertTransferRecord(mintToken, targetWallet, amount, client) {
 }
 
 async function main() {
-  const mintToken = "us8mD4jGkFWnUuAHB8V5ZcrAosEqi2h1Zcyca68QA1G"; // BIRD
+  const mintToken = "FJG2aEPtertCXoedgteCCMmgngSZo1Zd715oNBzR7xpR"; // FIRE
   const targetWalletList = [];
   await client.connect();
 
-  // Task ID here
+  // Task ID here(FTT)
   const stakingList = await getStakingKey(
-    "6BpcAD5YvFEDmWNykxLJzvHuvVh5H5DWwLAtjGF8zRFC"
+    "Gz2xuLQW1scgiasVLfefteifwWj4GnCJCt1SyYTSr3L4"
   );
   // Populate targetWalletList with the addresses from stakingList
   for (let walletAddress of Object.keys(stakingList)) {
@@ -61,7 +61,7 @@ async function main() {
         continue;
       }
       // const walletAddress = targetWalletList[i];
-      const amount = 900; // Adjust the amount as needed
+      const amount = 10; // Adjust the amount as needed
 
       // Check if this wallet and mint token already exists in the database
       const exists = await checkExistingTransfer(
