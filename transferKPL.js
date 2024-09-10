@@ -2,6 +2,7 @@ const transferKPL = require("./helpers/transferKPL");
 const getStakingKey = require("./helpers/getStakingKey");
 const getStakingAccountInfo = require("./helpers/getStakingAccountInfo");
 const { MongoClient } = require("mongodb");
+const cron = require("node-cron"); // Add node-cron
 require("dotenv").config();
 
 const uri = process.env.DB_KEY;
@@ -95,4 +96,8 @@ async function main() {
   }
 }
 
-main();
+// Schedule the job to run every day at midnight
+cron.schedule("0 0 * * *", async () => {
+    console.log("Running the transfer script at midnight");
+    await main();
+  });
