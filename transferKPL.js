@@ -3,6 +3,7 @@ const getStakingKey = require("./helpers/getStakingKey");
 const getStakingAccountInfo = require("./helpers/getStakingAccountInfo");
 const { MongoClient } = require("mongodb");
 const cron = require("node-cron"); // Add node-cron
+const moment = require("moment");
 require("dotenv").config();
 
 const uri = process.env.DB_KEY;
@@ -88,16 +89,36 @@ async function main() {
           `Inserted transfer record for ${walletAddress} into MongoDB`
         );
       }
-      // Delay for 5 seconds
-      await delay(5000);
+      // Delay for 0.5 seconds
+      await delay(500);
     }
   } finally {
     await client.close(); // Always ensure that the client is closed
   }
 }
 
+// Function to calculate time until next job
+function timeUntilNextJob(hour, minute) {
+  const now = moment();
+  const nextJob = moment().hour(hour).minute(minute).second(0);
+
+  // If the next job time is earlier in the day than now, schedule it for tomorrow
+  if (now.isAfter(nextJob)) {
+    nextJob.add(1, 'days');
+  }
+
+  const duration = moment.duration(nextJob.diff(now));
+  const hours = Math.floor(duration.asHours());
+  const minutes = Math.floor(duration.minutes());
+
+  console.log(`Next job will start in ${hours} hours and ${minutes} minutes.`);
+}
+
+// Check how long until the job starts at 20:00 (8 PM)
+timeUntilNextJob(20, 0);
+
 // Schedule the job to run every day at midnight
-cron.schedule("0 14 * * *", async () => {
+cron.schedule("0 20 * * *", async () => {
     console.log("Running the transfer script at noon");
     await main();
   });
