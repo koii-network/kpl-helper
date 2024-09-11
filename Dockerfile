@@ -14,4 +14,4 @@ RUN yarn install
 COPY . .
 
 # Command to run the app
-CMD [ "node", "index.js" ]
+CMD [ "node", "transferKPL.js" ]
