@@ -97,7 +97,7 @@ async function main() {
 }
 
 // Schedule the job to run every day at midnight
-cron.schedule("0 0 * * *", async () => {
-    console.log("Running the transfer script at midnight");
+cron.schedule("0 12 * * *", async () => {
+    console.log("Running the transfer script at noon");
     await main();
   });
