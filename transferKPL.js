@@ -1,6 +1,7 @@
 const transferKPL = require("./helpers/transferKPL");
 const getStakingKey = require("./helpers/getStakingKey");
 const getStakingAccountInfo = require("./helpers/getStakingAccountInfo");
+const getUserMainWallet = require("./helpers/getUserMainWallet");
 const { MongoClient } = require("mongodb");
 const cron = require("node-cron"); // Add node-cron
 const moment = require("moment");
@@ -40,13 +41,13 @@ async function insertTransferRecord(mintToken, targetWallet, amount, client) {
 }
 
 async function main() {
-  const mintToken = "FJG2aEPtertCXoedgteCCMmgngSZo1Zd715oNBzR7xpR"; // FIRE
+  const mintToken = "us8mD4jGkFWnUuAHB8V5ZcrAosEqi2h1Zcyca68QA1G"; // BIRD
   const targetWalletList = [];
   await client.connect();
 
   // Task ID here(FTT)
   const stakingList = await getStakingKey(
-    "Gz2xuLQW1scgiasVLfefteifwWj4GnCJCt1SyYTSr3L4"
+    "Aqr6jKpv7spkZ8TpLpEsLF5jvjNeHpaHaHPtkt4UTkn6"
   );
   // Populate targetWalletList with the addresses from stakingList
   for (let walletAddress of Object.keys(stakingList)) {
@@ -57,10 +58,19 @@ async function main() {
 
   try {
     for (let i = 0; i < targetWalletList.length; i++) {
-      const walletAddress = await getStakingAccountInfo(targetWalletList[i]);
+      let walletAddress = await getStakingAccountInfo(targetWalletList[i]);
       if (!walletAddress) {
-        console.log(`No transactions found for ${targetWalletList[i]}`);
-        continue;
+        // console.log(`No transactions found for ${targetWalletList[i]}`);
+        try {
+          walletAddress = await getUserMainWallet(targetWalletList[i]);
+          if (!walletAddress) {
+            // console.log(`Main wallet not found for ${targetWalletList[i]}`);
+            continue;
+          }
+        } catch (error) {
+          console.error("Error fetching main wallet:", error);
+          continue;
+        }
       }
       // const walletAddress = targetWalletList[i];
       const amount = 10; // Adjust the amount as needed
@@ -80,17 +90,18 @@ async function main() {
 
       // Perform the transfer
       const signature = await transferKPL(mintToken, walletAddress, amount);
-      console.log(`Transferred ${amount} KPL to ${walletAddress}`);
+
 
       // Add the transfer details to MongoDB
       if (signature) {
+        console.log(`Transferred ${amount} KPL to ${walletAddress}`);
         await insertTransferRecord(mintToken, walletAddress, amount, client);
         console.log(
           `Inserted transfer record for ${walletAddress} into MongoDB`
         );
       }
       // Delay for 0.5 seconds
-      await delay(500);
+      await delay(200);
     }
   } finally {
     await client.close(); // Always ensure that the client is closed
@@ -115,10 +126,10 @@ function timeUntilNextJob(hour, minute) {
 }
 
 // Check how long until the job starts at 20:00 (8 PM)
-timeUntilNextJob(20, 0);
+// timeUntilNextJob(20, 0);
 
 // Schedule the job to run every day at midnight
-cron.schedule("0 20 * * *", async () => {
-    console.log("Running the transfer script at noon");
-    await main();
-  });
+// cron.schedule("0 20 * * *", async () => {
+//     console.log("Running the transfer script at noon");
+    main();
+  // });

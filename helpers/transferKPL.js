@@ -61,7 +61,7 @@ async function transferKPL(mintToken, targetWallet, amount) {
   
         if (attempt >= maxRetries) {
           console.error("All transfer attempts failed.");
-          throw new Error("Transfer failed after multiple attempts");
+          return null;
         } else {
           console.log(`Retrying... (${attempt}/${maxRetries})`);
         }
