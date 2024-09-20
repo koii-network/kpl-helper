@@ -1,90 +1,115 @@
-# Koii Task Middleman
+# KPL Token Transfer Script
 
-This project aims to bridge the gap between the Koii Task Submissions and a standardized database.
+This project handles automated KPL (Koii Payment Layer) token transfers between wallets. It connects to a MongoDB database to track transfers and uses a cron scheduler for periodic execution.
 
-![Task Middleman](https://i.imgur.com/JeNpHHO.png)
+## Prerequisites
 
-## Steps:
+Before running the script, ensure you have the following:
 
-- Reads submissions from a Koii Task.
-- Extracts the referred data from IPFS using a submission list.
-- Stores the data in a MongoDB database.
-- Server API: Includes an Express.js server setup to manage keywords and receive task data updates.
+1. **Node.js**: Make sure Node.js is installed. You can download it from [here](https://nodejs.org/).
+2. **MongoDB**: Ensure you have access to a MongoDB instance, either locally or using a cloud provider like MongoDB Atlas.
+3. **Solana Web3.js**: This project interacts with the Solana blockchain, so you will need an active Solana testnet or mainnet endpoint.
 
-It uses a queuing system to manage concurrency and ensure efficient processing.
+### Required Environment Variables
 
-## Structure
+In the `.env` file, set the following:
 
-- **index.js**: Main entry point that orchestrates the fetching and posting processes.
-- **queue.js**: Contains the logic for queuing the tasks, such as sending tweets and handling CID data and save data do mongoDB.
-- **server.js**: Server setup to interact with the running Task.
+- `SECRET_KEY`: Your private key for the Solana wallet, in JSON format.
+- `DB_KEY`: MongoDB connection string for your database.
 
-
-## Dependencies
-
-- **async-await-queue**: For managing task concurrency.
-- **axios**: For making HTTP requests.
-
-## Usage
-
-1. Install Dependencies
-   Before running the project, make sure to install the required dependencies:
+Example `.env`:
 
 ```bash
-yarn install
-```
-or
-
-```bash
-npm install
+SECRET_KEY=[1,2,3,4,...]  # Replace with your actual secret key
+DB_KEY=mongodb+srv://<user>:<password>@cluster0.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
 ```
 
-2. Configure Server and Tokens
-   Ensure that the server URL and any required tokens or headers are properly configured in the sendTweet function inside the api directory. To extract the data from IPFS, you need to provide the `SECRET_WEB3_STORAGE_KEY` in .env file. To post the data to the server, you need to provide the `USER_TOKEN` in .env file.
+## Installation
 
-3. Run the Project
-   You can run the project by executing the following command:
+1. Clone the repository:
 
-```bash
-npm run start
-```
+   ```bash
+   git clone <repository-url>
+   cd <project-directory>
+   ```
 
-This will start the process of fetching tweets, save them to mongoDB and posting them to the configured server.
+2. Install dependencies:
 
-To test the project, you can use the following command:
+   ```bash
+   npm install
+   ```
 
-```bash
-npm run test
-```
+3. Add your `.env` file with the required environment variables.
 
- <!-- This will start a server that listen on localhost:3333 will receive the tweets and log them to the console. Then in `api/sendTweet.js` file, change the server url to locahost:3333. -->
+## Functionality
 
-3. Run the server
-  To interact with running tasks and manage data reception:
-```bash
-npm run server
-```
+### Main Components
 
-This starts the server and makes it available for receiving and processing data according to configured tasks.
-
-## Functions
-### index.js
-- **main()**: Keeps looping to get the latest task data and send it to queue.js to process
-### queue.js
-- **queueCID(submissionList)**
-  - Parameters:
-    - **submissionList**: An array of submission data including CIDs.
-  - Description: Extracts tweet data from IPFS using the provided CIDs.
-- **queuePost(tweetList, i)**
-  - Parameters:
-    - **tweetList**: An array of tweet data.
-    - **i**: An index used for tracking the process.
-  - Description: Handles the queuing and sending of tweets to the server.
-### helpers/getTaskData.js
-- **getTaskData(taskID, round)**: Gets the task Data and wait for new round to load
-### helpers/dataFromCid.js
-- **dataFromCid(cid, filename)**: Gets the content from both IPFS Storage SDK and direct accessing (as backup)
+- **transferKPL**: Transfers a specified amount of KPL tokens from a source wallet to a target wallet.
+- **MongoDB Integration**:
+  - Stores records of token transfers.
+  - Checks if a wallet already received a token to avoid duplicate transfers.
+- **Scheduling**: The script uses `node-cron` to schedule transfers at specific times.
   
-## Note
+### Core Functions
 
-Make sure that the server is configured to receive the data in the expected format and that all necessary headers, tokens, and timeouts are properly set.
+- `transferKPL(mintToken, targetWallet, amount)`: Handles the token transfer process for a specific `mintToken` and `targetWallet`.
+  
+- `getStakingKey(stakingID)`: Retrieves staking-related information by a task ID.
+
+- `getStakingAccountInfo(walletAddress)`: Returns account info for a specific staking account.
+
+- `checkExistingTransfer(mintToken, targetWallet, client)`: Checks if a transfer has already been made to avoid duplicates.
+
+- `insertTransferRecord(mintToken, targetWallet, amount, client)`: Inserts the transfer details into the MongoDB collection.
+
+- `timeUntilNextJob(hour, minute)`: Logs how long until the next cron job is scheduled to run.
+
+### MongoDB Database Structure
+
+The MongoDB collection `userKPLtransfer` stores the transfer records with the following structure:
+
+```json
+{
+  "targetWallet": "<wallet_address>",
+  "mintToken": {
+    "<mint_token>": <amount>
+  },
+  "timestamp": "<timestamp>"
+}
+```
+
+## Running the Script
+
+1. **Manual Run**:
+   
+   Run the script manually with:
+
+   ```bash
+   node <script.js>
+   ```
+
+2. **Automated Job**:
+
+   The script uses `node-cron` to schedule token transfers. Example cron job running at 8 PM daily:
+
+   ```js
+   cron.schedule("0 20 * * *", async () => {
+     main();
+   });
+   ```
+
+To calculate the time until the next scheduled job, use:
+
+```js
+timeUntilNextJob(20, 0);  // Example: next job at 8 PM
+```
+
+## Notes
+
+- **Retry Logic**: The transfer function includes retry logic that attempts to transfer tokens up to three times if an error occurs.
+- **Delay**: The script includes a 200 ms delay between consecutive transfers to avoid hitting rate limits.
+
+## License
+
+This project is licensed under the MIT License.
