@@ -1,6 +1,6 @@
 # KPL Token Transfer Script
 
-This project handles automated KPL (Koii Payment Layer) token transfers between wallets. It connects to a MongoDB database to track transfers and uses a cron scheduler for periodic execution.
+This project handles automated KPL (Koii Programming Library) token transfers between wallets. It connects to a MongoDB database to track transfers and uses a cron scheduler for periodic execution.
 
 ## Prerequisites
 
