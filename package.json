@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@_koii/create-task-cli": "^1.1.5",
     "@_koii/storage-task-sdk": "^1.2.7",
     "@_koii/web3.js": "^0.1.11",
     "@solana/spl-token": "^0.4.8",
