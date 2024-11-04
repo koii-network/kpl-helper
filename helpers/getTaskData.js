@@ -27,26 +27,26 @@ async function getTaskData(taskID, round) {
 
   //Checks if there is a new round:
   if (round < maxRound) {
-    console.log(`A new round, ${maxRound} has been detected.`);
-    console.log("Waiting 2 Minutes for the potential submission period.");
+    // console.log(`A new round, ${maxRound} has been detected.`);
+    // console.log("Waiting 2 Minutes for the potential submission period.");
     await new Promise((resolve) => setTimeout(resolve, 600));
-    console.log("2 Minutes has passed, re-starting the operation.");
+    // console.log("2 Minutes has passed, re-starting the operation.");
     await getLatestTaskData();
   } else {
     return false;
   }
 
   // Iterate through the entries in the highest round
-  for (let entry in taskState.submissions[maxRound]) {
+  for (let entry in taskState.submissions[maxRound - 1]) {
     // Extract the submission_value and add it to the list
     submissionList.push(
-      taskState.submissions[maxRound][entry].submission_value
+      taskState.submissions[maxRound - 1][entry].submission_value
     );
   }
 
   return {
     submissions: submissionList,
-    maxRound: maxRound,
+    maxRound: maxRound - 1,
     roundTime: taskState.round_time
   };
 }
