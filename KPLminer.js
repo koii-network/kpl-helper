@@ -66,7 +66,9 @@ async function main() {
       "n3Rep7GRh3jgkGXaULNu8WzfuwCC9Rcrv82mxzJMnnH", // SONO
       "NGFruaQX9xHqWv195RNQL2wtq2LJwTmnkE9XjGAZKHx", // SOMA
       "3kh898gitJDSb6b7MsntLqyUAvy3Y6D4PkMyGfinubht", // VIP
-      "EErjDSPHmjz9ZipEtVoN54QzCjPvePBADvXcWKT659NW" // SSS
+      "EErjDSPHmjz9ZipEtVoN54QzCjPvePBADvXcWKT659NW", // SSS
+      "HK8STMDTos4QFocyEADxwdXBrN13DCB9AcwLXsmvBthh" // SMART
+
     ];
 
     const taskData = await getTaskData(
@@ -107,6 +109,9 @@ async function main() {
     }
   } catch (error) {
     console.error("Error in main function:", error);
+    console.log("Retrying in 5 seconds");
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    main();
   }
 }
 
