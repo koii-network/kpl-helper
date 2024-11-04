@@ -107,6 +107,11 @@ async function main() {
       // Record the transfer after processing all addresses
       await recordTransfer(taskData.maxRound, randomKPL, addresses);
     }
+
+    // Wait for the next round
+    console.log("Waiting for the next round...");
+    // await new Promise((resolve) => setTimeout(resolve, taskData.roundTime * 1000));
+    main();
   } catch (error) {
     console.error("Error in main function:", error);
     console.log("Retrying in 5 seconds");
