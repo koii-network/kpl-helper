@@ -62,11 +62,11 @@ async function main() {
       "us8mD4jGkFWnUuAHB8V5ZcrAosEqi2h1Zcyca68QA1G", // BIRD
       "9UcQaSsBTeXowhMBgSbTEeQubGHxXDNJRjz4s7uxibTP", // BB
       "FJG2aEPtertCXoedgteCCMmgngSZo1Zd715oNBzR7xpR", // FIRE
-      "BmdvRw51zhCKfkBmw6jmLawJafimTMtZ2eVwT3fL2WM6", // RATs
+      // "BmdvRw51zhCKfkBmw6jmLawJafimTMtZ2eVwT3fL2WM6", // RATs
       "n3Rep7GRh3jgkGXaULNu8WzfuwCC9Rcrv82mxzJMnnH", // SONO
-      "NGFruaQX9xHqWv195RNQL2wtq2LJwTmnkE9XjGAZKHx", // SOMA
+      // "NGFruaQX9xHqWv195RNQL2wtq2LJwTmnkE9XjGAZKHx", // SOMA
       "3kh898gitJDSb6b7MsntLqyUAvy3Y6D4PkMyGfinubht", // VIP
-      "EErjDSPHmjz9ZipEtVoN54QzCjPvePBADvXcWKT659NW", // SSS
+      // "EErjDSPHmjz9ZipEtVoN54QzCjPvePBADvXcWKT659NW", // SSS
       "HK8STMDTos4QFocyEADxwdXBrN13DCB9AcwLXsmvBthh" // SMART
 
     ];
