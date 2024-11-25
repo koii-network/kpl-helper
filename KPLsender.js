@@ -6,7 +6,7 @@ const { MongoClient } = require("mongodb");
 require("dotenv").config();
 
 const uri = process.env.DB_KEY;
-const DB_name = "tweets_middleman";
+const DB_name = "airdrop_middleman";
 const collection_name = "kplsender";
 
 const client = new MongoClient(uri, {
@@ -46,7 +46,7 @@ async function recordTransfer(round, kplToken, address) {
       timestamp: new Date(),
     });
 
-    console.log(`Recorded transfer for round ${round}`);
+    // console.log(`Recorded transfer for round ${round}`);
   } catch (error) {
     console.error("Error recording transfer:", error);
   } finally {
@@ -56,12 +56,12 @@ async function recordTransfer(round, kplToken, address) {
 
 async function main() {
   try {
-    const KPLMintAddress = "EErjDSPHmjz9ZipEtVoN54QzCjPvePBADvXcWKT659NW"; // SSS
+    const KPLMintAddress = "6kgpmvSCh6aVNXnCihnrtFYcjLR7pkK6mcLgf3imEC4q"; // ASLINK
     const connection = new Connection("https://testnet.koii.network");
 
     const taskData = await getTaskStateInfo(
       connection,
-      "7dkNVRtCbm1w9LAuMVYQUMgq85Wkme8GZ7TUPvgoCEe5" // SSS
+      "DLfP5RCAdYiirmn8cigptQusg8ds75JzFXSrHc8ydyeu" // Task ID
     );
     const stakeList = taskData.stake_list;
     const addresses = Object.keys(stakeList);
@@ -84,7 +84,7 @@ async function main() {
             continue;
           }
         }
-        const amount = 0.5; // Convert amount to correct KPL
+        const amount = 1; // Convert amount to correct KPL
         const transferResult = await transferKPL(
           KPLMintAddress,
           walletAddress,

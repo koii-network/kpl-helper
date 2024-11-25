@@ -1,4 +1,5 @@
 const { Connection, PublicKey } = require("@_koii/web3.js");
+const  { getTaskStateInfo } = require("@_koii/create-task-cli");
 
 async function getTaskData(taskID, round) {
   const connection = new Connection("https://testnet.koii.network");
@@ -13,8 +14,11 @@ async function getTaskData(taskID, round) {
   let taskState;
 
   async function getLatestTaskData() {
-    const accountInfo = await connection.getAccountInfo(new PublicKey(taskID));
-    taskState = JSON.parse(accountInfo.data);
+    // const accountInfo = await connection.getAccountInfo(new PublicKey(taskID));
+    const taskState = await getTaskStateInfo(connection, taskID);
+
+    // taskState = JSON.parse(accountInfo.data);
+    console.log(taskState);
 
     // Create a submissionList to contain each submission_value
     submissionList = [];
@@ -50,4 +54,5 @@ async function getTaskData(taskID, round) {
     roundTime: taskState.round_time
   };
 }
+// getTaskData("6n14Y6Y5uUvD93AAMDv3UvQpVPgWhdeYDSPztwKvbdQZ", 0);
 module.exports = getTaskData;
