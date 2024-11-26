@@ -71,16 +71,18 @@ async function main() {
 
     ];
 
+    let addresses = {};
+
     const taskData = await getTaskData(
-      "DLfP5RCAdYiirmn8cigptQusg8ds75JzFXSrHc8ydyeu",
+      "CPscE41WQxF9j8KuwJD7GGv9yjCNZRyWLsGjS3f9V4Kp",
       0
     );
     
     const randomKPL = listOfKPLs[Math.floor(Math.random() * listOfKPLs.length)];
 
     // Split 500 KPL among all submission addresses
-    const totalKPL = 500;
-    const addresses = taskData.submissions;
+    const totalKPL = 1000;
+    addresses.push(taskData);
     let kplPerSubmission = totalKPL / addresses.length;
     kplPerSubmission = parseFloat(kplPerSubmission.toFixed(2));
 
