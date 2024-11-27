@@ -18,7 +18,7 @@ async function getTaskData(taskID, round) {
     const taskState = await getTaskStateInfo(connection, taskID);
 
     // taskState = JSON.parse(accountInfo.data);
-    console.log(taskState);
+    console.log(taskState.submissions);
 
     // Create a submissionList to contain each submission_value
     submissionList = [];
@@ -41,6 +41,7 @@ async function getTaskData(taskID, round) {
   }
 
   // Iterate through the entries in the highest round
+  console.log(taskState)
   for (let entry in taskState.submissions[maxRound - 1]) {
     // Extract the submission_value and add it to the list
     submissionList.push(
