@@ -1,6 +1,5 @@
 const { MongoClient } = require("mongodb");
 require("dotenv").config();
-const { Connection, PublicKey } = require("@_koii/web3.js");
 
 async function getFrequentstakingKeys() {
   const uri = process.env.MONGO_URI;
@@ -92,6 +91,7 @@ async function getFrequentstakingKeys() {
 
     // Output frequent staking keys
     console.log(frequentStakingKeys.length);
+    return frequentStakingKeys
   } catch (error) {
     console.error("Error:", error);
   } finally {
@@ -99,4 +99,4 @@ async function getFrequentstakingKeys() {
   }
 }
 
-getFrequentstakingKeys();
+module.exports = getFrequentstakingKeys;
