@@ -62,8 +62,8 @@ async function main() {
       // "NGFruaQX9xHqWv195RNQL2wtq2LJwTmnkE9XjGAZKHx", // SOMA
       "3kh898gitJDSb6b7MsntLqyUAvy3Y6D4PkMyGfinubht", // VIP
       // "EErjDSPHmjz9ZipEtVoN54QzCjPvePBADvXcWKT659NW", // SSS
-    //   "HK8STMDTos4QFocyEADxwdXBrN13DCB9AcwLXsmvBthh", // SMART
-    
+      //   "HK8STMDTos4QFocyEADxwdXBrN13DCB9AcwLXsmvBthh", // SMART
+      "6kgpmvSCh6aVNXnCihnrtFYcjLR7pkK6mcLgf3imEC4q", // ASTRO
     ];
 
     let stakingList = await getFrequentstakingKeys();
