@@ -7,6 +7,7 @@
     "start": "node index.js",
     "dockerize": "docker build -t yigitkoii/twitter_task_middleman . && docker push yigitkoii/twitter_task_middleman",
     "test": "node tests/testIndex.js",
+    "airdrop": "node airdrop.js",
     "server": "node server"
   },
   "author": "",
