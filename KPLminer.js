@@ -61,31 +61,37 @@ async function main() {
     const listOfKPLs = [
       "us8mD4jGkFWnUuAHB8V5ZcrAosEqi2h1Zcyca68QA1G", // BIRD
       "9UcQaSsBTeXowhMBgSbTEeQubGHxXDNJRjz4s7uxibTP", // BB
-      "FJG2aEPtertCXoedgteCCMmgngSZo1Zd715oNBzR7xpR", // FIRE
-      // "BmdvRw51zhCKfkBmw6jmLawJafimTMtZ2eVwT3fL2WM6", // RATs
-      "n3Rep7GRh3jgkGXaULNu8WzfuwCC9Rcrv82mxzJMnnH", // SONO
-      // "NGFruaQX9xHqWv195RNQL2wtq2LJwTmnkE9XjGAZKHx", // SOMA
+      "6kgpmvSCh6aVNXnCihnrtFYcjLR7pkK6mcLgf3imEC4q", // ASTRO
+      "5WWwTwzaM9So2pxAY3wzktTDHARhhnRmSvYpxxw5wLkJ", // FISH
+      "CgdFgTz2iX9B63XASmraYExu9gTs27DfK7JW4S6tbmgD", // KVN
       "3kh898gitJDSb6b7MsntLqyUAvy3Y6D4PkMyGfinubht", // VIP
+      "n3Rep7GRh3jgkGXaULNu8WzfuwCC9Rcrv82mxzJMnnH", // SONO
+      // "FJG2aEPtertCXoedgteCCMmgngSZo1Zd715oNBzR7xpR", // FIRE
+      // "BmdvRw51zhCKfkBmw6jmLawJafimTMtZ2eVwT3fL2WM6", // RATs
+      // "NGFruaQX9xHqWv195RNQL2wtq2LJwTmnkE9XjGAZKHx", // SOMA
       // "EErjDSPHmjz9ZipEtVoN54QzCjPvePBADvXcWKT659NW", // SSS
-      "HK8STMDTos4QFocyEADxwdXBrN13DCB9AcwLXsmvBthh" // SMART
+      // "HK8STMDTos4QFocyEADxwdXBrN13DCB9AcwLXsmvBthh" // SMART
 
     ];
 
-    let addresses = {};
+    let addresses = [];
 
     const taskData = await getTaskData(
-      "CPscE41WQxF9j8KuwJD7GGv9yjCNZRyWLsGjS3f9V4Kp",
+      "DLfP5RCAdYiirmn8cigptQusg8ds75JzFXSrHc8ydyeu",
       0
     );
     
     const randomKPL = listOfKPLs[Math.floor(Math.random() * listOfKPLs.length)];
 
     // Split 500 KPL among all submission addresses
-    const totalKPL = 1000;
-    addresses.push(taskData);
+    const totalKPL = 3000;
+
+    addresses = taskData.submissions;
+
     let kplPerSubmission = totalKPL / addresses.length;
     kplPerSubmission = parseFloat(kplPerSubmission.toFixed(2));
 
+    console.log("Miner round: ", taskData.maxRound)
     console.log("Random KPL: ", randomKPL);
     console.log("Total KPL: ", totalKPL);
     console.log("KPL per submission: ", kplPerSubmission);
