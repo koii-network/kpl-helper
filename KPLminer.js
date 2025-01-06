@@ -85,23 +85,21 @@ async function main() {
     const randomKPL = listOfKPLs[Math.floor(Math.random() * listOfKPLs.length)];
 
     // Split 500 KPL among all submission addresses
-    const totalKPL = 3000;
-
+    // const totalKPL = 3000;
     addresses = taskData.submissions;
+    // let kplPerSubmission = totalKPL / addresses.length;
+    // kplPerSubmission = parseFloat(kplPerSubmission.toFixed(2));
 
-    let kplPerSubmission = totalKPL / addresses.length;
-    kplPerSubmission = parseFloat(kplPerSubmission.toFixed(2));
+    let kplPerSubmission = 0.2;
 
     console.log("Miner round: ", taskData.maxRound)
     console.log("Random KPL: ", randomKPL);
-    console.log("Total KPL: ", totalKPL);
     console.log("KPL per submission: ", kplPerSubmission);
     console.log("Addresses: ", addresses.length);
 
     let checkTransferred = await hasRoundTransferred(taskData.maxRound);
     if (checkTransferred) {
       console.log("Round already transferred", taskData.maxRound);
-      return;
     } else {
       // Transfer KPL to all addresses
       for (let i = 0; i < addresses.length; i++) {
@@ -119,7 +117,7 @@ async function main() {
 
     // Wait for the next round
     console.log("Waiting for the next round...");
-    // await new Promise((resolve) => setTimeout(resolve, taskData.roundTime * 1000));
+    await new Promise((resolve) => setTimeout(resolve, 600000));
     main();
   } catch (error) {
     console.error("Error in main function:", error);
