@@ -57,7 +57,7 @@ async function recordTransfer(round, kplToken, address) {
 async function main() {
   try {
     const KPLMintAddress = "6kgpmvSCh6aVNXnCihnrtFYcjLR7pkK6mcLgf3imEC4q"; // ASLINK
-    const connection = new Connection("https://testnet.koii.network");
+    const connection = new Connection("https://mainnet.koii.network");
 
     const taskData = await getTaskStateInfo(
       connection,

@@ -3,7 +3,7 @@ const { createMint, getOrCreateAssociatedTokenAccount, mintTo, transfer } = requ
 
 async function transferKPL() {
     // Connect to cluster
-    const connection = new Connection("https://testnet.koii.network", 'confirmed');
+    const connection = new Connection("https://mainnet.koii.network", 'confirmed');
 
     // Generate a new wallet keypair and airdrop SOL
     const fromWallet = Keypair.fromSecretKey(new Uint8Array([89,180,83,123,109,152,95,35,191,113,240,237,32,235,71,190,31,209,172,124,7,171,141,66,241,110,173,36,209,2,99,139,219,165,158,9,212,226,167,98,140,242,193,62,137,195,114,131,47,50,38,242,70,90,136,46,112,98,197,110,161,78,198,242])); // Replace with your own secret key

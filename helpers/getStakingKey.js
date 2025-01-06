@@ -1,7 +1,7 @@
 const { Connection, PublicKey } = require("@_koii/web3.js");
 
 async function getStakingKey(taskID) {
-  const connection = new Connection("https://testnet.koii.network");
+  const connection = new Connection("https://mainnet.koii.network");
 
   // Check if TASK_ID is defined
   if (!taskID) {
