@@ -4,8 +4,8 @@ const { MongoClient } = require("mongodb");
 require("dotenv").config();
 
 const uri = process.env.DB_KEY;
-const DB_name = "tweets_middleman";
-const collection_name = "kpltokenminer";
+const DB_name = "mainnet_airdrop_middleman";
+const collection_name = "kplminer";
 
 async function hasRoundTransferred(round) {
   const client = new MongoClient(uri, {
@@ -58,15 +58,16 @@ async function recordTransfer(round, kplToken, transfers) {
 
 async function main() {
   try {
+    // mainnet kpl token mint addresses
     const listOfKPLs = [
-      "us8mD4jGkFWnUuAHB8V5ZcrAosEqi2h1Zcyca68QA1G", // BIRD
-      "9UcQaSsBTeXowhMBgSbTEeQubGHxXDNJRjz4s7uxibTP", // BB
-      "6kgpmvSCh6aVNXnCihnrtFYcjLR7pkK6mcLgf3imEC4q", // ASTRO
-      "5WWwTwzaM9So2pxAY3wzktTDHARhhnRmSvYpxxw5wLkJ", // FISH
-      "CgdFgTz2iX9B63XASmraYExu9gTs27DfK7JW4S6tbmgD", // KVN
-      "3kh898gitJDSb6b7MsntLqyUAvy3Y6D4PkMyGfinubht", // VIP
-      "n3Rep7GRh3jgkGXaULNu8WzfuwCC9Rcrv82mxzJMnnH", // SONO
-      // "FJG2aEPtertCXoedgteCCMmgngSZo1Zd715oNBzR7xpR", // FIRE
+      "Fe7878UvoGHUM7B8C95rX3MigUqtBZmtcPcX5sz3Qhxd", // BIRD
+      "AayQB5XgchRR9zTr5bi95aQ1FFtJ6jEVmbrBQRx5m4gw", // BB
+      "CJLjkLohs3PScpBQ3r1WKHjQsWYPq291MgPjpTWTXNc4", // ASTRO
+      "4qayyw53kWz6GzypcejjT1cvwMXS1qYLSMQRE8se3gTv", // FIRE
+      "9VUq3SfNDh1bgwamF8tr9aGvuXvNi6ktjx1Edc2da7ey", // VIP
+      // "5WWwTwzaM9So2pxAY3wzktTDHARhhnRmSvYpxxw5wLkJ", // FISH
+      // "CgdFgTz2iX9B63XASmraYExu9gTs27DfK7JW4S6tbmgD", // KVN
+      // "n3Rep7GRh3jgkGXaULNu8WzfuwCC9Rcrv82mxzJMnnH", // SONO
       // "BmdvRw51zhCKfkBmw6jmLawJafimTMtZ2eVwT3fL2WM6", // RATs
       // "NGFruaQX9xHqWv195RNQL2wtq2LJwTmnkE9XjGAZKHx", // SOMA
       // "EErjDSPHmjz9ZipEtVoN54QzCjPvePBADvXcWKT659NW", // SSS

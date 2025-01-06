@@ -13,7 +13,7 @@ require("dotenv").config({ path: "../.env" });
 async function transferKPL(mintToken, targetWallet, amount) {
     const SECRET_KEY = JSON.parse(process.env.SECRET_KEY);
     const connection = new Connection(
-      "https://testnet.koii.network",
+      "https://mainnet.koii.network",
       "confirmed"
     );
     
