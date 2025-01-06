@@ -1,7 +1,7 @@
 const { Connection, PublicKey } = require("@_koii/web3.js");
 
 async function getStakingAccountInfo(stakingKey) {
-    const connection = new Connection("https://testnet.koii.network");
+    const connection = new Connection("https://mainnet.koii.network");
     const publicKey = new PublicKey(stakingKey);
 
 

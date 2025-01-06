@@ -41,7 +41,7 @@ async function insertTransferRecord(mintToken, targetWallet, amount, client) {
 }
 
 async function main() {
-  const mintToken = "us8mD4jGkFWnUuAHB8V5ZcrAosEqi2h1Zcyca68QA1G"; // BIRD
+  const mintToken = "Fe7878UvoGHUM7B8C95rX3MigUqtBZmtcPcX5sz3Qhxd"; // BIRD
   const targetWalletList = [];
   await client.connect();
 

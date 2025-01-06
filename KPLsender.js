@@ -6,7 +6,7 @@ const { MongoClient } = require("mongodb");
 require("dotenv").config();
 
 const uri = process.env.DB_KEY;
-const DB_name = "airdrop_middleman";
+const DB_name = "mainnet_airdrop_middleman";
 const collection_name = "kplsender";
 
 const client = new MongoClient(uri, {
@@ -56,12 +56,12 @@ async function recordTransfer(round, kplToken, address) {
 
 async function main() {
   try {
-    const KPLMintAddress = "6kgpmvSCh6aVNXnCihnrtFYcjLR7pkK6mcLgf3imEC4q"; // ASLINK
-    const connection = new Connection("https://testnet.koii.network");
+    const KPLMintAddress = "CJLjkLohs3PScpBQ3r1WKHjQsWYPq291MgPjpTWTXNc4"; // ASLINK
+    const connection = new Connection("https://mainnet.koii.network");
 
     const taskData = await getTaskStateInfo(
       connection,
-      "DLfP5RCAdYiirmn8cigptQusg8ds75JzFXSrHc8ydyeu" // Task ID
+      "8CQT6QJN8ZUJWHgBAJBKxbuyBuE43fxA1jMGBGQPbCUZ" // Task ID
     );
     const stakeList = taskData.stake_list;
     const addresses = Object.keys(stakeList);

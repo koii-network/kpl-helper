@@ -2,7 +2,7 @@ const { Connection, PublicKey } = require("@_koii/web3.js");
 const  { getTaskStateInfo } = require("@_koii/create-task-cli");
 
 async function getTaskData(taskID, round) {
-  const connection = new Connection("https://testnet.koii.network");
+  const connection = new Connection("https://mainnet.koii.network");
 
   // Check if TASK_ID is defined
   if (!taskID) {
@@ -42,6 +42,7 @@ async function getTaskData(taskID, round) {
 
   // Iterate through the entries in the highest round
   // console.log(taskState.submissions)
+  // console.log("task state", taskState);
   for (let entry in taskState.submissions[maxRound - 1]) {
     // Extract the submission_value and add it to the list
     submissionList.push(
