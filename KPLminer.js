@@ -65,6 +65,8 @@ async function main() {
       "CJLjkLohs3PScpBQ3r1WKHjQsWYPq291MgPjpTWTXNc4", // ASTRO
       "4qayyw53kWz6GzypcejjT1cvwMXS1qYLSMQRE8se3gTv", // FIRE
       "9VUq3SfNDh1bgwamF8tr9aGvuXvNi6ktjx1Edc2da7ey", // VIP
+      "AoH4CZCusGBivTYAPukc8euJDHDsbbcfyDcL429GFj3C", // SOMA
+      "BY5Vjkd34oK9QeahjPdTPkQFGBawFycSrkDSqE8JXqc5", // SONA
       // "5WWwTwzaM9So2pxAY3wzktTDHARhhnRmSvYpxxw5wLkJ", // FISH
       // "CgdFgTz2iX9B63XASmraYExu9gTs27DfK7JW4S6tbmgD", // KVN
       // "n3Rep7GRh3jgkGXaULNu8WzfuwCC9Rcrv82mxzJMnnH", // SONO
