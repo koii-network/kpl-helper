@@ -3,6 +3,7 @@ const transferKOII = require("./helpers/transferKOII");
 const { getTaskStateInfo } = require("@_koii/create-task-cli");
 const getStakingAccountInfo = require("./helpers/getStakingAccountInfo");
 const { MongoClient } = require("mongodb");
+const fs = require('fs');
 require("dotenv").config();
 
 const uri = process.env.DB_KEY;
@@ -60,16 +61,54 @@ async function recordTransfer(taskId, address, walletAddress, amount, signature)
   }
 }
 
+function getAddressesFromFile(fileName) {
+  try {
+    const fileData = fs.readFileSync(fileName, 'utf8');
+    const jsonData = JSON.parse(fileData);
+    return jsonData.addresses;
+  } catch (error) {
+    console.error('Error reading addresses from file:', error);
+    return null;
+  }
+}
+
 async function main() {
   try {
     const connection = new Connection("https://mainnet.koii.network");
-    const taskData = await getTaskStateInfo(
-      connection,
-      "GKvoaVSNAfV96nGui8EmhWcVpg38n6s545isjHDUQoVF" // Task ID
-    );
-    const stakeList = taskData.stake_list;
-    const addresses = Object.keys(stakeList);
+    // const taskData = await getTaskStateInfo(
+    //   connection,
+    //   "GKvoaVSNAfV96nGui8EmhWcVpg38n6s545isjHDUQoVF" // Task ID
+    // );
+    // const stakeList = taskData.stake_list;
+    // const addresses = Object.keys(stakeList);
+
+    // Get addresses from file
+    const addresses = getAddressesFromFile('stakeList_2025-02-07T21-36-23-065Z.json');
+    if (!addresses) {
+      console.error('Failed to load addresses from file');
+      return;
+    }
+    console.log(`Loaded ${addresses.length} addresses from file`);
+    // console.log(addresses);
     
+    // Store addresses in a JSON file (If needed)
+    // const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    // const fileName = `stakeList_${timestamp}.json`;
+    
+    // const dataToStore = {
+    //   taskId: "GKvoaVSNAfV96nGui8EmhWcVpg38n6s545isjHDUQoVF",
+    //   timestamp: new Date().toISOString(),
+    //   addresses: addresses,
+    //   stakeList: stakeList // Including full stake list data for reference
+    // };
+
+    // fs.writeFileSync(
+    //   fileName,
+    //   JSON.stringify(dataToStore, null, 2)
+    // );
+    
+    // console.log(`Stored ${addresses.length} addresses in ${fileName}`);
+
     // Process transfers in batches of 10
     const batchSize = 10;
     for (let i = 0; i < addresses.length; i += batchSize) {
@@ -92,7 +131,7 @@ async function main() {
           }
 
           console.log("Processing:", address, "walletAddress:", walletAddress);
-          const amount = 0.000000001;
+          const amount = 100;
           const transferResult = await transferKOII(
             connection,
             walletAddress,

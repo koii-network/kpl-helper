@@ -52,3 +52,6 @@ jspm_packages/
 *.ntvs*
 *.njsproj
 *.sln
+
+# New line to ignore all files that start with "stakeList_" and end with ".json"
+stakeList_*.json
