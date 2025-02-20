@@ -69,9 +69,10 @@ async function main() {
       taskID,
       0
     );
+    // console.log("taskData", taskData);
     
-    addresses = taskData.submissions;
-    let koiiPerSubmission = 0.2;
+    addresses = taskData.submitters;
+    let koiiPerSubmission = 0.001;
 
     console.log("Miner round: ", taskData.maxRound)
     console.log("KOII per submission: ", koiiPerSubmission);
