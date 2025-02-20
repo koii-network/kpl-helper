@@ -10,7 +10,7 @@ async function getStakingKey(taskID) {
 
   const accountInfo = await connection.getAccountInfo(new PublicKey(taskID));
   let taskState = JSON.parse(accountInfo.data);
-  let stakingList =  taskState.stake_list
+  let stakingList =  taskState.stake_list;
 //   console.log(stakingList);
   return stakingList;
 }

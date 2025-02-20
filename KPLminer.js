@@ -97,7 +97,7 @@ async function main() {
 
     let kplPerSubmission = 0.2;
 
-    console.log("Miner round: ", taskData.maxRound)
+    console.log("Miner round: ", taskData.maxRound);
     console.log("Random KPL: ", randomKPL);
     console.log("KPL per submission: ", kplPerSubmission);
     console.log("Addresses: ", addresses.length);

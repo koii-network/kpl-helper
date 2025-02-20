@@ -90,7 +90,7 @@ async function testSaveTweets() {
     'bafybeih6jqexcbflrbeasfi2koofh4fxmc3mfesdm3ihzrkymcvoguyyx4',
     'bafybeihohpyarnnsm4geuaaitwbcrpnxdrd5domrxyyptzvxx75qympogi',
     'bafybeiccilkcgnwtfdrx2hn7s5upl3soe2gffjxqfqzw2skwu277mf4kha'
-  ] 
+  ]; 
   try {
     const tweetList = await queueCID(submissionList);
     console.log('weet list length:', tweetList.length);

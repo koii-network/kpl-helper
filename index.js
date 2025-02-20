@@ -28,7 +28,7 @@ async function main() {
   if (round < taskData.maxRound) {
     round = taskData.maxRound;
     console.log("Current round is", round, "...");
-    const submissionList = taskData.submissions
+    const submissionList = taskData.submissions;
     const tweetList = await queueCID(submissionList);
     
     console.log("Operation complete, calling the function again.");

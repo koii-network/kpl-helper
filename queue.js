@@ -108,7 +108,7 @@ async function queueCID(submissionList,batchSize = BATCH_SIZE) {
 //Read Twitter data based on CID
 async function readSubmission(cid) {
   try {
-    const fileName = 'dataList.json'
+    const fileName = 'dataList.json';
     let tweetData = await dataFromCid(cid,fileName);
         await saveTweetsToMongoDB(tweetData);
     return tweetData;

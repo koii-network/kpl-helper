@@ -91,7 +91,7 @@ async function getFrequentstakingKeys() {
 
     // Output frequent staking keys
     console.log(frequentStakingKeys.length);
-    return frequentStakingKeys
+    return frequentStakingKeys;
   } catch (error) {
     console.error("Error:", error);
   } finally {
