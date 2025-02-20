@@ -1,6 +1,7 @@
 const getTaskData = require("./helpers/getTaskData");
 const transferKPL = require("./helpers/transferKPL");
 const { MongoClient } = require("mongodb");
+const { Connection } = require("@_koii/web3.js");
 require("dotenv").config();
 
 const uri = process.env.DB_KEY;
@@ -58,6 +59,7 @@ async function recordTransfer(round, kplToken, transfers) {
 
 async function main() {
   try {
+    const connection = new Connection("https://mainnet.koii.network");
     // mainnet kpl token mint addresses
     const listOfKPLs = [
       "Fe7878UvoGHUM7B8C95rX3MigUqtBZmtcPcX5sz3Qhxd", // BIRD
@@ -80,6 +82,7 @@ async function main() {
     let addresses = [];
 
     const taskData = await getTaskData(
+      connection,
       "7iCiMCD1Qs3MRTTPuY9Qrid68c4F2WPZaBpZW4j9tKVv",
       0
     );

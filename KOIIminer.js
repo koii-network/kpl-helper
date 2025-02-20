@@ -1,6 +1,7 @@
 const getTaskData = require("./helpers/getTaskData");
 const transferKOII = require("./helpers/transferKOII");
 const { MongoClient } = require("mongodb");
+const { Connection } = require("@_koii/web3.js");
 require("dotenv").config();
 
 const uri = process.env.DB_KEY;
@@ -29,7 +30,7 @@ async function hasRoundTransferred(round) {
   }
 }
 
-async function recordTransfer(round, koiiToken, transfers) {
+async function recordTransfer(round, koiiToken, transfers, taskID) {
   const client = new MongoClient(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -45,6 +46,7 @@ async function recordTransfer(round, koiiToken, transfers) {
       round: round,
       token: koiiToken,
       transfers: transfers, // An array of objects with { address, amount }
+      taskID: taskID,
       timestamp: new Date(),
     });
 
@@ -59,9 +61,12 @@ async function recordTransfer(round, koiiToken, transfers) {
 async function main() {
   try {
     let addresses = [];
+    const taskID = "4ESVAytVPEmTWeVGxKX3kVhFrfFYPkXSCTMqFmWc5M4v";
 
+    const connection = new Connection("https://mainnet.koii.network");
     const taskData = await getTaskData(
-      "4ESVAytVPEmTWeVGxKX3kVhFrfFYPkXSCTMqFmWc5M4v",
+      connection,
+      taskID,
       0
     );
     
@@ -79,7 +84,7 @@ async function main() {
       // Transfer KOII to all addresses
       for (let i = 0; i < addresses.length; i++) {
         const address = addresses[i];
-        const transferResult = await transferKOII(address, koiiPerSubmission);
+        const transferResult = await transferKOII(connection, address, koiiPerSubmission);
         
         if (transferResult) {
           console.log(`Transferred ${koiiPerSubmission} KOII to ${address}`);
@@ -87,7 +92,7 @@ async function main() {
       }
       
       // Record the transfer after processing all addresses
-      await recordTransfer(taskData.maxRound, "KOII", addresses);
+      await recordTransfer(taskData.maxRound, "KOII", addresses, taskID);
     }
 
     // Wait for the next round

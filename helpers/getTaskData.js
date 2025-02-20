@@ -1,7 +1,7 @@
 const { Connection, PublicKey } = require("@_koii/web3.js");
 const  { getTaskStateInfo } = require("@_koii/create-task-cli");
 
-async function getTaskData(taskID, round) {
+async function getTaskData(connection, taskID, round) {
   const connection = new Connection("https://mainnet.koii.network");
 
   // Check if TASK_ID is defined
