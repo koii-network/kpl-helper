@@ -61,7 +61,7 @@ async function main() {
 
     const taskData = await getTaskStateInfo(
       connection,
-      "7iCiMCD1Qs3MRTTPuY9Qrid68c4F2WPZaBpZW4j9tKVv" // Task ID
+      "E1EF4QTSMVXvVCGLu5iCBVhwvYdkUAq1qxvVg3e4xP5F" // Task ID
     );
     const stakeList = taskData.stake_list;
     const addresses = Object.keys(stakeList);

@@ -82,8 +82,7 @@ async function main() {
     let addresses = [];
 
     const taskData = await getTaskData(
-      connection,
-      "7iCiMCD1Qs3MRTTPuY9Qrid68c4F2WPZaBpZW4j9tKVv",
+      "E1EF4QTSMVXvVCGLu5iCBVhwvYdkUAq1qxvVg3e4xP5F",
       0
     );
     
