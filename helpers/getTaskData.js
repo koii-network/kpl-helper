@@ -1,8 +1,6 @@
-const { Connection, PublicKey } = require("@_koii/web3.js");
 const  { getTaskStateInfo } = require("@_koii/create-task-cli");
 
-async function getTaskData(taskID, round) {
-  const connection = new Connection("https://mainnet.koii.network");
+async function getTaskData(connection, taskID, round) {
 
   // Check if TASK_ID is defined
   if (!taskID) {
@@ -12,6 +10,7 @@ async function getTaskData(taskID, round) {
   let maxRound;
   let submissionList;
   let taskState;
+  let submitterList;
 
   async function getLatestTaskData() {
     // const accountInfo = await connection.getAccountInfo(new PublicKey(taskID));
@@ -20,8 +19,9 @@ async function getTaskData(taskID, round) {
     // taskState = JSON.parse(accountInfo.data);
     // console.log(taskState.submissions);
 
-    // Create a submissionList to contain each submission_value
+    // Initialize both lists
     submissionList = [];
+    submitterList = [];
 
     // Identify the round with the highest number
     maxRound = Math.max(...Object.keys(taskState.submissions).map(Number));
@@ -43,15 +43,17 @@ async function getTaskData(taskID, round) {
   // Iterate through the entries in the highest round
   // console.log(taskState.submissions)
   // console.log("task state", taskState);
-  for (let entry in taskState.submissions[maxRound - 1]) {
-    // Extract the submission_value and add it to the list
+  for (let submitterKey in taskState.submissions[maxRound - 1]) {
+    // Store only the submission_value in submissionList
     submissionList.push(
-      taskState.submissions[maxRound - 1][entry].submission_value
+      taskState.submissions[maxRound - 1][submitterKey].submission_value
     );
+    submitterList.push(submitterKey);
   }
 
   return {
     submissions: submissionList,
+    submitters: submitterList,
     maxRound: maxRound - 1,
     roundTime: taskState.round_time
   };

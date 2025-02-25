@@ -1,12 +1,12 @@
 const getTaskData = require("./helpers/getTaskData");
-const transferKPL = require("./helpers/transferKPL");
+const transferKOII = require("./helpers/transferKOII");
 const { MongoClient } = require("mongodb");
 const { Connection } = require("@_koii/web3.js");
 require("dotenv").config();
 
 const uri = process.env.DB_KEY;
 const DB_name = "mainnet_airdrop_middleman";
-const collection_name = "kplminer";
+const collection_name = "koiiminer";
 
 async function hasRoundTransferred(round) {
   const client = new MongoClient(uri, {
@@ -30,7 +30,7 @@ async function hasRoundTransferred(round) {
   }
 }
 
-async function recordTransfer(round, kplToken, transfers) {
+async function recordTransfer(round, koiiToken, transfers, taskID) {
   const client = new MongoClient(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -44,8 +44,9 @@ async function recordTransfer(round, kplToken, transfers) {
     // Insert the transfer record
     await transfersCollection.insertOne({
       round: round,
-      token: kplToken,
+      token: koiiToken,
       transfers: transfers, // An array of objects with { address, amount }
+      taskID: taskID,
       timestamp: new Date(),
     });
 
@@ -59,65 +60,40 @@ async function recordTransfer(round, kplToken, transfers) {
 
 async function main() {
   try {
-    const connection = new Connection("https://mainnet.koii.network");
-    // mainnet kpl token mint addresses
-    const listOfKPLs = [
-      "Fe7878UvoGHUM7B8C95rX3MigUqtBZmtcPcX5sz3Qhxd", // BIRD
-      "AayQB5XgchRR9zTr5bi95aQ1FFtJ6jEVmbrBQRx5m4gw", // BB
-      "CJLjkLohs3PScpBQ3r1WKHjQsWYPq291MgPjpTWTXNc4", // ASTRO
-      "4qayyw53kWz6GzypcejjT1cvwMXS1qYLSMQRE8se3gTv", // FIRE
-      "9VUq3SfNDh1bgwamF8tr9aGvuXvNi6ktjx1Edc2da7ey", // VIP
-      "AoH4CZCusGBivTYAPukc8euJDHDsbbcfyDcL429GFj3C", // SOMA
-      "BY5Vjkd34oK9QeahjPdTPkQFGBawFycSrkDSqE8JXqc5", // SONA
-      // "5WWwTwzaM9So2pxAY3wzktTDHARhhnRmSvYpxxw5wLkJ", // FISH
-      // "CgdFgTz2iX9B63XASmraYExu9gTs27DfK7JW4S6tbmgD", // KVN
-      // "n3Rep7GRh3jgkGXaULNu8WzfuwCC9Rcrv82mxzJMnnH", // SONO
-      // "BmdvRw51zhCKfkBmw6jmLawJafimTMtZ2eVwT3fL2WM6", // RATs
-      // "NGFruaQX9xHqWv195RNQL2wtq2LJwTmnkE9XjGAZKHx", // SOMA
-      // "EErjDSPHmjz9ZipEtVoN54QzCjPvePBADvXcWKT659NW", // SSS
-      // "HK8STMDTos4QFocyEADxwdXBrN13DCB9AcwLXsmvBthh" // SMART
-
-    ];
-
     let addresses = [];
+    const taskID = "4ESVAytVPEmTWeVGxKX3kVhFrfFYPkXSCTMqFmWc5M4v";
 
+    const connection = new Connection("https://mainnet.koii.network");
     const taskData = await getTaskData(
       connection,
-      "E1EF4QTSMVXvVCGLu5iCBVhwvYdkUAq1qxvVg3e4xP5F",
+      taskID,
       0
     );
+    // console.log("taskData", taskData);
     
-    const randomKPL = listOfKPLs[Math.floor(Math.random() * listOfKPLs.length)];
-
-    // Split 500 KPL among all submission addresses
-    // const totalKPL = 3000;
-    addresses = taskData.submissions;
-    // let kplPerSubmission = totalKPL / addresses.length;
-    // kplPerSubmission = parseFloat(kplPerSubmission.toFixed(2));
-
-    let kplPerSubmission = 0.2;
+    addresses = taskData.submitters;
+    let koiiPerSubmission = 0.001;
 
     console.log("Miner round: ", taskData.maxRound)
-    console.log("Random KPL: ", randomKPL);
-    console.log("KPL per submission: ", kplPerSubmission);
+    console.log("KOII per submission: ", koiiPerSubmission);
     console.log("Addresses: ", addresses.length);
 
     let checkTransferred = await hasRoundTransferred(taskData.maxRound);
     if (checkTransferred) {
       console.log("Round already transferred", taskData.maxRound);
     } else {
-      // Transfer KPL to all addresses
+      // Transfer KOII to all addresses
       for (let i = 0; i < addresses.length; i++) {
         const address = addresses[i];
-        const transferResult = await transferKPL(randomKPL, address, kplPerSubmission);
+        const transferResult = await transferKOII(connection, address, koiiPerSubmission);
         
         if (transferResult) {
-          console.log(`Transferred ${kplPerSubmission} KPL to ${address}`);
+          console.log(`Transferred ${koiiPerSubmission} KOII to ${address}`);
         }
       }
       
       // Record the transfer after processing all addresses
-      await recordTransfer(taskData.maxRound, randomKPL, addresses);
+      await recordTransfer(taskData.maxRound, "KOII", addresses, taskID);
     }
 
     // Wait for the next round
